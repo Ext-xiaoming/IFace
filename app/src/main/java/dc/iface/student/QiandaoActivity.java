@@ -43,7 +43,7 @@ import dc.iface.SQL.DBUtils;
 
 
 public class QiandaoActivity {
-   /* private String studentId;
+    /*private String studentId;
     private String courseCode;
     private double sbjingdu2;
     private double sbweidu2;
@@ -181,9 +181,9 @@ public class QiandaoActivity {
         });
     }
 
-    *//**
+    *
      * 跳转到扫码界面扫码
-     *//*
+
     private void goScan(){
         Intent intent = new Intent(QiandaoActivity.this, CaptureActivity.class);
         startActivityForResult(intent, REQUEST_CODE_SCAN);
@@ -266,9 +266,9 @@ public class QiandaoActivity {
                                     System.out.printf( e.getMessage() );
                                 }
 
-                                *//***
+                                **
                                  *查询结束后需要对比数据   时间  和 位置
-                                 *//*
+
                                 SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
                                 Date curDate = new Date(System.currentTimeMillis());
                                 final String curTime = formatter.format(curDate);
@@ -360,9 +360,9 @@ public class QiandaoActivity {
 
     public void QuerySignIN(int sign_id,int student_id,int post_type,int post_id ,int post_num)
     {
-        *//***
+        **
          *添加学生签到信息 首先需要确定 sign_in 的值 查询当前最大值，+1
-         *//*
+
         DBUtils dbUtils = new DBUtils();
         String sql = "insert into sign_in  (sign_id ,student_id,post_type,post_id, post_num)" +
                 "values ("+ sign_id + "," + student_id + "," + post_type  +"," +  post_id + "," + post_num +")";
@@ -388,7 +388,7 @@ public class QiandaoActivity {
             return d * Math.PI / 180.0;
         }
 
-        *//**
+        *
          * Lat1 Lung1 表示A点经纬度，Lat2 Lung2 表示B点经纬度； a=Lat1 – Lat2 为两点纬度之差 b=Lung1
          * -Lung2 为两点经度之差； 6378.137为地球半径，单位为千米；  计算出来的结果单位为千米。
          * 通过经纬度获取距离(单位：千米)
@@ -397,7 +397,7 @@ public class QiandaoActivity {
          * @param lat2
          * @param lng2
          * @return
-         *//*
+
         public double getDistance(double lat1, double lng1, double lat2,
                                          double lng2) {
             double radLat1 = rad(lat1);
