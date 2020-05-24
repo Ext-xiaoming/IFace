@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity {
         TextView text_title =findViewById(R.id.text_title);
         switch (index) {
             case 0:
-                changeFragment(new MainFragmentClass(teacherId).getMainFragment(teacherId));
+                changeFragment(new MainFragmentClass().getMainFragment(teacherId));
                 text_title.setText("课堂");//将当前Fragment的toolbar设置为相应的字样 如 ：“课堂”
                 break;
             case 1:

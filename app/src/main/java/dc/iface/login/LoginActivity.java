@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.text.InputType;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -15,17 +16,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import dc.iface.BaseActivity.ActivityCollectorUtil;
 import dc.iface.BaseActivity.BaseActivity;
 import dc.iface.BaseActivity.StatisClass;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
 import dc.iface.object.MyUser;
+import dc.iface.student.ChangePswActivity;
 import dc.iface.student.ForgetPswActivity;
 import dc.iface.student.StuMainActivity;
 import dc.iface.teacher.MainActivity;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener{
@@ -98,29 +111,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 View cv = getWindow().getDecorView();
                 // loginBtn.performClick();
                 // Toast.makeText(LoginActivity.this," loginBtn.performClick();",Toast.LENGTH_SHORT).show();
-                denglu(cv);
+                toLogin(cv);
                 Toast.makeText( LoginActivity.this,"自动登录成功！", Toast.LENGTH_SHORT).show();
             }
         }
 
-        //******************************************************************************
-
-        //******************************************************************************
-        //实现记住密码功能，首先要将账号密码提取为字符串形式，
-
-        //String getAccount = editTextName.getText().toString();
-        //String getPassword= editTextPwd.getText().toString();
-        //******************************************************************************
-
     }
-
-
 
     @Override
     public void onClick(final View view) {
         switch (view.getId()) {
             case R.id.denglu:
-                denglu(view);
+                toLogin(view);
                 break;
             case R.id.text_sign_up:
                 signUp();
@@ -161,7 +163,121 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         finish();
     }
 
-    public void denglu(final View view) {
+
+    public void toLogin(final View view) {
+        //获取输入的账号密码
+        jobNum = editTextName.getText().toString();
+        password = editTextPwd.getText().toString();
+
+        if(jobNum.isEmpty() || password.isEmpty()){
+            Toast.makeText( LoginActivity.this,"账号密码不能为空！", Toast.LENGTH_LONG).show();
+        }else{
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OkHttpClient client = new OkHttpClient();
+                    FormBody body = new FormBody.Builder()
+                            .add("userId",jobNum)
+                            .add("password",password)
+                            .build();
+
+                    final Request request = new Request.Builder()
+                            .url("http://10.34.15.176:8000/login/")
+                            .post(body)
+                            .build();
+                    Call call = client.newCall(request);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            System.out.printf( "失败！" );
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText( LoginActivity.this, "网络请求失败！" , Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if(response.isSuccessful()){
+                                final String result = response.body().string();
+                                parseJSONWithJSONObject(result);
+                                Log.d( "LoginActivity", result );
+                            }
+                        }
+                    });
+
+                }
+            }).start();
+        }
+    }
+    //json解析
+    private void parseJSONWithJSONObject(String jsonData){
+        try {
+            JSONObject jsonObject= new JSONObject( jsonData );
+            int res =jsonObject.getInt( "RESULT" );
+            Log.d( "LoginActivity","RESULT is "+res );
+            HandleResponse(res);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void HandleResponse(final int res) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(res!=-1){
+                    //记住密码
+                    if(rememberPass.isChecked()){//如果勾选
+                        editor.putBoolean("rememberPassword",true);
+                        editor.putString("account",jobNum);
+                        editor.putString("password",password);
+                        editor.putBoolean("autologin",true);
+                        System.out.printf( "//记住密码T  " );
+                    }
+                    else{
+                        editor.clear();
+                    }
+                    editor.apply();
+
+                    if(res==1){
+                        System.out.printf( "//启动ActivityT  " );
+                        intent = new Intent(LoginActivity.this, MainActivity.class);//教师
+                        intent.putExtra("teacherId",jobNum);
+                        startActivity(intent);
+                        finish();
+                    }else{
+                        System.out.printf( "//启动ActivityS  " );
+                        intent = new Intent(LoginActivity.this, StuMainActivity.class);//1为学生
+                        intent.putExtra("studentId",jobNum);
+                        startActivity(intent);
+                        finish();
+                    }
+
+                }else{
+                    Toast.makeText(LoginActivity.this, "账号不存在 请重新输入" , Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+ /*public void denglu(final View view) {
         //获取输入的账号密码
         jobNum = editTextName.getText().toString();
         password = editTextPwd.getText().toString();
@@ -192,7 +308,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     }
 
-
     public boolean  QueryIsStudent(){
         boolean isStudent=false;
         DBUtils dbUtils= new DBUtils();
@@ -222,7 +337,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         return isStudent;
     }
 
-
     public boolean  QueryIsTeacher(){
         boolean isTeacher=false;
 
@@ -251,7 +365,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         System.out.printf( "教师账号认定结束  "+isTeacher );
         return isTeacher;
     }
-
 
     public boolean  PswIsRight(String id,int user){
         boolean flag=false;//密码不正确
@@ -296,9 +409,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             }
         }
         return flag;
-    }
+    }*/
 
-    public void GoToActivity()
+   /* public void GoToActivity()
     {
         System.out.printf( String.valueOf( flag ) );
         System.out.printf( "//记住密码处理 " );
@@ -352,158 +465,4 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             });
         }
     }
-
-}
-
-
-
-
-/*
-*{
-
-            final String jobNum = editTextName.getText().toString();
-            final String password = editTextPwd.getText().toString();
-
-            if(jobNum.isEmpty() || password.isEmpty()){
-
-                Toast.makeText( LoginActivity.this,"账号密码不能为空！", Toast.LENGTH_LONG).show();
-            }
-            else {
-                Log.i(TAG, "1 " + jobNum + " ");
-                int flag=0;//判断是学生还是老师
-                String name = editTextName.getText().toString();
-                    try{
-                        DBUtils dbUtils= new DBUtils();
-                        String sql = "select  student_password from  student where student_id ="+jobNum;
-                        System.out.printf( sql );
-                        ResultSet resultSet = dbUtils.excuteSQL( sql );
-                        /// resultSet.next();
-
-                        if(resultSet.next()){
-                            System.out.println("+++++++++");
-                            //如果结果不为空，则证明该账号是学生
-                            myUser.setFlag(false);//学生
-                            if(password.equals(resultSet.getString("student_password"))){
-
-                                System.out.printf( resultSet.getString("student_password") );
-
-                                //如果密码框内的密码和 查询出来的密码一样，则表明是密码正确
-                                if(rememberPass.isChecked()){//如果勾选
-                                    editor.putBoolean("rememberPassword",true);
-                                    editor.putString("account",jobNum);
-                                    editor.putString("password",password);
-                                    editor.putBoolean("autologin",true);
-                                }
-                                else{
-                                    editor.clear();
-                                }
-                                editor.apply();
-                                //***关闭数据库连接
-                                resultSet.getStatement().getConnection().close();
-                                System.out.printf( " 开始跳转 " );
-                                //******************************************************************************
-                               Intent intent = new Intent(LoginActivity.this, StuMainActivity.class);//false为学生
-                                intent.putExtra("studentId",jobNum);
-            //关闭当前的登陆activity
-
-            }else{
-        //此时已经证明这个是学生
-        //如果密码不一致，则表明输入的密码错误
-        System.out.printf( "学生账号 密码错误 请重新输入 " );
-        Looper.prepare();
-        Toast.makeText(LoginActivity.this, "学生账号 密码错误 请重新输入" , Toast.LENGTH_LONG).show();
-        Looper.loop();
-        //***关闭数据库连接
-        resultSet.getStatement().getConnection().close();
-
-        }
-
-        }else{
-        resultSet.getStatement().getConnection().close();
-
-        try{
-        //如果结果为空，则表明没有查到该账号，则继续进行教师账号的查询
-        sql = "select  teacher_password from  teacher where teacher_id ="+jobNum;
-        System.out.printf( sql );
-
-        resultSet = dbUtils.excuteSQL( sql );
-        if(resultSet.next()){
-        System.out.printf( "132132" );
-        //表明账号是教师
-        myUser.setFlag(true);//老师
-        try {
-        System.out.printf( "24354646\n" );
-        if(password.equals(resultSet.getString("teacher_password"))){
-        //如果密码框内的密码和 查询出来的密码一样，则表明是密码正确
-        System.out.printf( password );
-        //******************************************************************************
-        //editor =pref.edit();//获取SharedPreferences.Editor对象，编辑操作的对象
-        if(rememberPass.isChecked()){//如果勾选
-        editor.putBoolean("rememberPassword",true);
-        editor.putString("account",jobNum);
-        editor.putString("password",password);
-        editor.putBoolean("autologin",true);
-        }
-        else{
-        editor.clear();
-        }
-        editor.apply();
-        //***关闭数据库连接
-        resultSet.getStatement().getConnection().close();
-
-        System.out.printf( "111111111" );
-        runOnUiThread(new Runnable() {
-@Override
-public void run() {
-        //******************************************************************************
-        intent=new Intent( LoginActivity.this, MainActivity.class);//true为老师
-        intent.putExtra("teacherId",jobNum);
-        //关闭当前的登陆activity
-        finish();
-        }
-        });
-        System.out.printf( "1333333333331" );
-        }else{
-        System.out.printf( "114444444441" );
-        //此时已经证明这个是学生
-        //如果密码不一致，则表明输入的密码错误
-        Looper.prepare();
-        Toast.makeText(LoginActivity.this, "教师账号 密码错误 请重新输入" , Toast.LENGTH_LONG).show();
-        Looper.loop();
-        //***关闭数据库连接
-        resultSet.getStatement().getConnection().close();
-        }
-        }catch (SQLException e){
-        Log.d(TAG,"SQL异常"+password+password);
-
-        e.printStackTrace();
-
-        }
-
-        }else{
-        resultSet.getStatement().getConnection().close();
-
-        //如果教师和学生都不是，那就是该账号不存在了
-        Looper.prepare();
-        Toast.makeText(LoginActivity.this, "账号不存在 请重新输入" , Toast.LENGTH_LONG).show();
-        Looper.loop();
-        }
-
-        // resultSet.getStatement().getConnection().close();
-        }catch(Exception e){
-        resultSet.getStatement().getConnection().close();
-        e.printStackTrace();
-        System.out.printf( e.getMessage() );
-        }
-        }
-
-        // resultSet.getStatement().getConnection().close();
-        }catch (Exception e){
-        //resultSet.getStatement().getConnection().close();
-        e.printStackTrace();
-        System.out.printf( e.getMessage() );
-        }
-
-        }
-        }
-        */
+*/

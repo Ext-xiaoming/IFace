@@ -84,7 +84,7 @@ public class StuMainActivity  extends BaseActivity {
         switch (index) {
             case 0:
                 System.out.printf( "----studentId="+studentId );
-                changeFragment(new StuMainFragmentClass(studentId).getMainFragment(studentId));
+                changeFragment(new StuMainFragmentClass().getMainFragment(studentId));
                 //Toast.makeText(StuMainActivity.this,  "学生", Toast.LENGTH_LONG).show();
                 text_title.setText("学生课堂");
                 break;

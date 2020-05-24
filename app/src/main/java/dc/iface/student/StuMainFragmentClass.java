@@ -23,19 +23,16 @@ import dc.iface.teacher.CoursesAdapter;
 public class StuMainFragmentClass extends Fragment {
     private static StuMainFragmentClass mf;
     private static String TAG = "StuMainFragmentClass";
-    private List<CourseListItem> listItemCourses = new ArrayList<>();//ListItem课程集
     private String studentId;
-    private  CoursesAdapter coursesAdapter;
-    //单例模式
-    public static StuMainFragmentClass getMainFragment(String studentid){
-        return  new StuMainFragmentClass(studentid);
-    }
+    private int i=0;
 
-    public StuMainFragmentClass(String studentId){
-        this.studentId= studentId;
-        System.out.printf("初始studentId= " +studentId );
+    public static StuMainFragmentClass getMainFragment(String studentId){
+        if(mf == null){
+            mf = new StuMainFragmentClass();
+        }
+        mf.studentId= studentId;
+        return mf;
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,11 +46,12 @@ public class StuMainFragmentClass extends Fragment {
         //教师名称 + 课程名称 + 加课码
         //从course中找到 教师名称 + 课程名称 ，从student_course中找到 加课码
         //*************************************************************************************************************
-
-
+        Log.d( "StuMainFragmentClass", String.valueOf( i++ ) );
+        final List<CourseListItem> listItemCourses = new ArrayList<>();//ListItem课程集
         new Thread( new Runnable() {
             @Override
             public void run() {
+
                 System.out.printf("studentId= " +studentId );
                 DBUtils dbUtils= new DBUtils();
                 String sql = "select  student_course.course_id,course_name,teacher_id  from  " +
@@ -70,7 +68,7 @@ public class StuMainFragmentClass extends Fragment {
                         listItemCourses.add(item);
                     }
 
-                    coursesAdapter = new CoursesAdapter(getActivity() ,
+                    final CoursesAdapter coursesAdapter = new CoursesAdapter(getActivity() ,
                             R.layout.course_item , listItemCourses);
 
                     getActivity().runOnUiThread(new Runnable() {

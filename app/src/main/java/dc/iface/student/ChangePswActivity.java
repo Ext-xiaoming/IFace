@@ -97,7 +97,6 @@ public class ChangePswActivity extends BaseActivity implements View.OnClickListe
             //new_password=str_2;
             ChangePassword();
 
-
             //************************************************************************************************
 
         }
