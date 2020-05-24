@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".teacher.MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+        <include layout="@layout/title_main"/>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/fragmentQ"
+        android:layout_marginTop="76dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="80dp">
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/main_radio"
+        android:layout_marginBottom="3dp"
+        android:background="@color/colorPrimaryDark"/>
+
+    <LinearLayout
+        android:id="@+id/main_radio"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:paddingTop="10dp">
+
+        <!-- 主页面下菜单栏android:paddingTop="5dp"android:layout_marginTop="30dp"-->
+        <RadioGroup
+            android:id="@+id/MenuBarBelowQ"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <!-- 主页面下菜单栏按钮-->
+            <RadioButton
+                android:id="@+id/MenuBarBelowClass"
+                style="@style/MenuBarOptionBelow"
+                android:checked="true"
+                android:drawableTop="@drawable/classz"
+                android:text="课堂" /><!--60X30-->
+
+            <RadioButton
+                android:id="@+id/MenuBarBelowUser"
+                style="@style/MenuBarOptionBelow"
+                android:drawableTop="@drawable/user"
+                android:text="个人中心" />
+        </RadioGroup>
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="horizontal">
+
+    <!--时间发布签到-->
+    <LinearLayout
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/checkNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+        <TextView
+            android:id="@+id/qiandaoTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingBottom="4dp"
+            android:textColor="@android:color/secondary_text_light" /><!--style="@style/TextAppearance.AppCompat.AppCompat.Subhead"-->
+    </LinearLayout>
+
+    <!--签到人数-->
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:paddingTop="20dp"
+            android:id="@+id/qiandaoNumber"
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            android:textColor="@android:color/secondary_text_light" />
+    </LinearLayout>
+</LinearLayout>

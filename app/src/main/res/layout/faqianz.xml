@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+        <include layout="@layout/title_sec"/>
+    </LinearLayout>
+
+   <!-- <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="360dp">
+
+        <ImageView
+            android:id="@+id/faqianQR"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>-->
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_width="360dp"
+        android:layout_height="360dp">
+        <com.baidu.mapapi.map.MapView
+            android:id="@+id/bmapView2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </com.baidu.mapapi.map.MapView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="100dp">
+        <TextView
+            android:layout_gravity="center"
+            android:layout_marginLeft="105dp"
+            android:gravity="center"
+            android:textSize="25dp"
+            android:text=""
+            android:paddingTop="10dp"
+            android:id="@+id/faqianNumber"
+            android:layout_width = "200dp"
+            android:layout_height = "60dp"
+            android:textColor="@android:color/secondary_text_light" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_width="250dp"
+        android:layout_height="70dp">
+        <Button
+
+            android:text="确认签到"
+            android:id="@+id/okQiandao"
+            android:layout_width = "match_parent"
+            android:layout_height = "match_parent"
+            android:textColor="@android:color/secondary_text_light" />
+    </LinearLayout>
+</LinearLayout>

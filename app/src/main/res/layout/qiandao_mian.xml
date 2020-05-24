@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="70dp">
+        <include layout="@layout/title_second"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="270dp">
+       <com.baidu.mapapi.map.MapView
+           android:id="@+id/bmapView"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent">
+
+       </com.baidu.mapapi.map.MapView>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:orientation="vertical"
+        android:gravity="center">
+        <Button
+            android:id="@+id/shuziBtn"
+            android:layout_width="200dp"
+            android:layout_height="80dp"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimary"
+            android:text="数 字 签 到"
+            android:textSize="28dp"/>
+       <!-- <Button
+            android:id="@+id/erweiBtn"
+            android:layout_width="200dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="30dp"
+            android:textColor="@android:color/white"
+            android:background="@color/colorPrimary"
+            android:text="二 维 码 签 到"
+            android:textSize="28dp"/>-->
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:orientation="horizontal"
+        android:gravity="center">
+        <TextView
+            android:layout_width="160dp"
+            android:layout_height="45dp"
+            android:text="二维码四位数："
+            android:textSize="22dp"
+            android:gravity="center"
+            android:textColor="@color/colorPrimary"/>
+        <TextView
+            android:id="@+id/ersign_num"
+            android:layout_width="160dp"
+            android:layout_height="45dp"
+            android:text=""
+            android:textSize="22dp"
+            android:gravity="center"/>
+    </LinearLayout>
+</LinearLayout>

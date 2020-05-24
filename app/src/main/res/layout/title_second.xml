@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_title_second"
+    android:layout_width="match_parent"
+    android:layout_height="70dp">
+    <TextView
+        android:id="@+id/text_titlesec"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal|center"
+        android:singleLine="true"
+        android:text="加入课堂"
+        android:textSize="26dp"
+        android:background="@color/colorPrimary"/>
+
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="60dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:gravity="center"
+        android:background="@color/colorPrimary"
+        android:src="@drawable/ic_arrow_back_black_24dp"
+        android:textSize="30dp"
+        />
+
+</RelativeLayout>

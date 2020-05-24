@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    tools:context=".teacher.MainActivity">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="90dp"
+            android:layout_height="90dp">
+            <ImageView
+                android:id="@+id/touxiang_image"
+                android:layout_width="90dp"
+                android:layout_height="90dp"
+                android:src="@drawable/test"/>
+        </LinearLayout>
+       <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:orientation="vertical">
+           <TextView
+               android:layout_marginTop="4dp"
+               android:id="@+id/xuehao_text"
+               android:layout_width="250dp"
+               android:layout_height="40dp"
+               android:layout_marginStart="20dp"
+               android:gravity="left|center_vertical"
+               android:text="1600300303"
+               android:textSize="22dp" />
+           <TextView
+               android:id="@+id/name_text"
+               android:layout_width="250dp"
+               android:layout_height="40dp"
+               android:text="Jaskson"
+               android:textSize="22dp"
+               android:gravity="left|center_vertical"
+               android:layout_marginStart="20dp"/>
+       </LinearLayout>
+
+    </LinearLayout>
+    <View
+        android:layout_marginTop="10dp"
+        android:layout_height="3px"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
+
+        />
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:orientation="vertical">
+       <!-- <TextView
+            android:id="@+id/shangchuanzp_text"
+            android:layout_marginTop="10dp"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:textSize="26dp"
+            android:text="上传照片"
+            android:textColor="@color/colorPrimary"/>-->
+        <TextView
+            android:id="@+id/xiugai_text"
+            android:layout_marginTop="20dp"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:textSize="26dp"
+            android:text="修改密码"
+            android:textColor="@color/colorPrimary"/>
+        <TextView
+            android:id="@+id/zhuxiao_text"
+            android:layout_marginTop="20dp"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:textSize="26dp"
+            android:text="注销登录"
+
+            android:textColor="@color/colorPrimary"/>
+    </LinearLayout>
+
+       
+
+
+</LinearLayout>
