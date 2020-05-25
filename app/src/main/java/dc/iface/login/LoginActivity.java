@@ -42,6 +42,7 @@ import okhttp3.Response;
 
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener{
+
     private TextView signUp;
     private EditText editTextName;
     private EditText editTextPwd;

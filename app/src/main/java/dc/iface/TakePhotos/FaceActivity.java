@@ -56,7 +56,6 @@ import static dc.iface.teacher.FaqianActivity.getSmallLetter;
 
 //教师端的人脸考勤选项
 public class FaceActivity extends BaseActivity {
-    //private PhotoHttpUtils photoHttpUtils= new PhotoHttpUtils();
     private Button mBtnTakePhoto;
     private Button mBtnSelectPhoto;
     private Button btnUploadPhoto;

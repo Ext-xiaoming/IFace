@@ -72,7 +72,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".TakePhotos.PhotoActivity"><!-- MAIN -->
 
+        </activity>
         <activity android:name=".TakePhotos.TakePhotoActivity"><!-- MAIN -->
 
         </activity>

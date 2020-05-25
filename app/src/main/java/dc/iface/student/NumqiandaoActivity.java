@@ -1,11 +1,9 @@
 package dc.iface.student;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -14,40 +12,29 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.baidu.mapapi.SDKInitializer;
 import com.baidu.mapapi.map.BaiduMap;
-import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapStatusUpdate;
 import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
-
 import org.json.JSONObject;
-
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 import dc.iface.BaseActivity.BaseActivity;
-import dc.iface.R;
-import dc.iface.SQL.DBUtils;
-import dc.iface.login.LoginActivity;
-import dc.iface.teacher.FaqianActivity;
-import dc.iface.teacher.MainActivity;
+import dc.iface.R;;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -481,150 +468,3 @@ public class NumqiandaoActivity extends BaseActivity  implements View.OnClickLis
     }
 
 }
-
-
-
-
-  /*  public String  QuerySignNum()
-    {
-        String sign_id="";
-
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select max(sign_id) from sign_in ";
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-            if(resultSet.next()){
-                sign_id=resultSet.getString( "max(sign_id)" );
-                resultSet.getStatement().getConnection().close();
-
-            }else {
-                System.out.printf( "" +
-                        "111111111111111" );
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.printf( e.getMessage() );
-        }
-        return sign_id;
-    }
-
-
-    public void QuerySignIN(String sign_id,String student_id,int post_type,String post_id ,String post_num)
-    {
-        *//***
-         *添加学生签到信息 首先需要确定 sign_in 的值 查询当前最大值，+1
-         *//*
-        System.out.printf( "启动！" );
-
-
-        DBUtils dbUtils = new DBUtils();
-        String sql = "insert into sign_in  (sign_id ,student_id,post_type,post_id, post_num)" +
-                " values ("+ Integer.parseInt( sign_id )+1 + "," + student_id + "," + post_type  +"," +  post_id + "," + post_num +")";
-        System.out.printf( sql );
-        int count = dbUtils.excuteSQLToADU( sql );
-
-        if(count>0){
-            Looper.prepare();
-            Toast.makeText(NumqiandaoActivity.this, "签到成功!", Toast.LENGTH_LONG).show();
-            Looper.loop();
-        }else{
-            Looper.prepare();
-            Toast.makeText(NumqiandaoActivity.this, "未成功签到！请检查网络！", Toast.LENGTH_LONG).show();
-            Looper.loop();
-        }
-    }*/
-/*
-//获取 sign_id post_id  student_id sign_date post_type  sign-经纬度
-//依靠course_id 从 post_check_in 中找到post_type  post_id post-经纬度 post_date post_num
-
-                new Thread( new Runnable() {
-@Override
-public void run() {
-
-//定义变量
-final String  course_id =  courseCode ;
-final String  student_id=  studentId;
-        String  post_id = editText.getText().toString();
-        Long post_date = Long.valueOf(0); //待查询
-        String  post_num ="";//待查询
-        double  post_longitude = 25.325341;//待查询
-        double  post_latitude =  110.422284;//待查询
-
-
-        DBUtils dbUtils= new DBUtils();
-
-        //首先查查是否已经签到了，方法：post_id是已知的，student_id已知 只需要查 sign_in是否有 有 就已经签到了不用再签了
-        String sql = "select * from sign_in where post_id="+post_id+" and student_id="+studentId;
-        System.out.printf( sql );
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-        try{
-
-        if(resultSet.next()) {
-        resultSet.getStatement().getConnection().close();
-        Looper.prepare();
-        Toast.makeText(NumqiandaoActivity.this, "已经签到成功，不用重复签到！", Toast.LENGTH_LONG).show();
-        Looper.loop();
-        }
-        else{
-        //在post_check_in 中查询 course_id 为 123 中post_num最大的那一条
-
-        sql = "select post_id , post_date, post_num , post_longitude , post_latitude  " +
-        "from  post_check_in  where  post_num in( select max(post_num) from post_check_in where post_id ="+post_id+ ")";
-        System.out.printf( sql );
-        resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-        while(resultSet.next()){
-        post_id=resultSet.getString( "post_id" );
-        post_date=resultSet.getLong( "post_date" );
-        post_num=resultSet.getString( "post_num" );
-        post_longitude=resultSet.getDouble( "post_longitude" );
-        post_latitude=resultSet.getDouble( "post_latitude" );
-        }
-        resultSet.getStatement().getConnection().close();
-        }catch (Exception e){
-        e.printStackTrace();
-        System.out.printf( e.getMessage() );
-        }
-
-        */
-/***
-         *查询结束后需要对比数据   时间  和 位置
-         *//*
-
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmm");
-        Date curDate = new Date(System.currentTimeMillis());
-final String curTime = formatter.format(curDate);
-        long timeCha = Long.parseLong(curTime) - post_date;
-
-        //发布签到距离10分钟失效，所以在10分钟内签到才有效
-        if (timeCha <= 10 && timeCha >= 0) {
-        GPSUtils  gpsUtils = new GPSUtils();
-        double Distance = gpsUtils.getDistance( post_latitude, post_longitude,  sbweidu2, sbjingdu2);
-        //学生签到的距离测试,距离大于100米则显示签到失败
-        System.out.printf( "距离= "+Distance );
-        if (Distance  < 100) {
-        //表明可以成功签到 ，插入信息
-        System.out.printf( "QuerySignNum()="+QuerySignNum() );
-        System.out.printf( "student_id()="+student_id );
-        QuerySignIN(QuerySignNum(),student_id,0,post_id,post_num);
-        }else{
-        Looper.prepare();
-        Toast.makeText(NumqiandaoActivity.this, "距离超过100米无法签到！", Toast.LENGTH_LONG).show();
-        Looper.loop();
-        }
-        } else{
-        Looper.prepare();
-        Toast.makeText(NumqiandaoActivity.this, "已超过签到时间10分钟！", Toast.LENGTH_LONG).show();
-        Looper.loop();
-        }
-        }
-        }catch (Exception e){
-        e.printStackTrace();
-        System.out.printf( e.getMessage() );
-        }
-        }
-        } ).start();
-*/

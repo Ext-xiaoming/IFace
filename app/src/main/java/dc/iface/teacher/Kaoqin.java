@@ -23,6 +23,7 @@ import dc.iface.BaseActivity.BaseActivity;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
 import dc.iface.TakePhotos.FaceActivity;
+import dc.iface.TakePhotos.PhotoActivity;
 import dc.iface.TakePhotos.TakePhotoActivity;
 import dc.iface.object.AdapterKaoqin;
 import dc.iface.object.ListItemKaoqin;
@@ -85,10 +86,10 @@ public class Kaoqin extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG , "1"+ "进入跳转" );
-                Intent intent2 = new Intent(Kaoqin.this, FaqianActivity.class);
+                Intent intent2 = new Intent(Kaoqin.this, PhotoActivity.class);
                 intent2.putExtra("courseId",courseCode);
-                intent2.putExtra("postId",courseCode);
                 intent2.putExtra("teacherId",teacherId);
+                intent2.putExtra("flag","1");
 
                 startActivity(intent2);
             }

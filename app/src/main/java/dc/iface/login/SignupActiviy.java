@@ -26,6 +26,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 
+
+
 public class SignupActiviy extends BaseActivity {
     private RadioGroup group;
     private RadioButton teacherRa;
@@ -106,7 +108,7 @@ public class SignupActiviy extends BaseActivity {
                                 .build();
 
                         final Request request = new Request.Builder()
-                                .url("http://10.34.15.176:8000/signUp/")
+                                .url("https://10.34.15.176:8000/signUp/")
                                 .post(body)
                                 .build();
                         Call call = client.newCall(request);

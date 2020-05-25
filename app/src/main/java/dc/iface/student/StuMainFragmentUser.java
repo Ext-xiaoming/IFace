@@ -14,6 +14,7 @@ import dc.iface.BaseActivity.ActivityCollectorUtil;
 import dc.iface.BaseActivity.StatisClass;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
+import dc.iface.TakePhotos.PhotoActivity;
 import dc.iface.TakePhotos.TakePhotoActivity;
 import dc.iface.login.LoginActivity;
 
@@ -81,8 +82,11 @@ public class StuMainFragmentUser extends Fragment {
             @Override
             public void onClick(View v) {
                 //进入修改密码的功能界面
-                Intent intent=new Intent(getActivity(), TakePhotoActivity.class);
+                Intent intent=new Intent(getActivity(), PhotoActivity.class);
                 intent.putExtra("studentId",userId);
+                intent.putExtra("flag","0");///学生
+
+
                 startActivity(intent);
             }
         });
