@@ -141,7 +141,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         }
         return buffer.toString();
     }
-    
+
     //回调
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -59,6 +59,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     public MyUser myUser = new MyUser();
     private Intent intent;
     private String jobNum;
+    private String userName;//名称
+
     private String password;
     private int flag=-1;
     @Override
@@ -218,7 +220,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         try {
             JSONObject jsonObject= new JSONObject( jsonData );
             int res =jsonObject.getInt( "RESULT" );
+            userName =jsonObject.getString( "userName" );
             Log.d( "LoginActivity","RESULT is "+res );
+            Log.d( "LoginActivity","userName is "+userName );
             HandleResponse(res);
         }catch (Exception e){
             e.printStackTrace();
@@ -247,12 +251,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                         System.out.printf( "//启动ActivityT  " );
                         intent = new Intent(LoginActivity.this, MainActivity.class);//教师
                         intent.putExtra("teacherId",jobNum);
+                        intent.putExtra("userName",userName);
+
                         startActivity(intent);
                         finish();
                     }else{
                         System.out.printf( "//启动ActivityS  " );
                         intent = new Intent(LoginActivity.this, StuMainActivity.class);//1为学生
                         intent.putExtra("studentId",jobNum);
+                        intent.putExtra("userName",userName);
                         startActivity(intent);
                         finish();
                     }

@@ -6,14 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.fragment.app.Fragment;
-
-import java.sql.ResultSet;
 import dc.iface.BaseActivity.ActivityCollectorUtil;
 import dc.iface.BaseActivity.StatisClass;
 import dc.iface.R;
-import dc.iface.SQL.DBUtils;
 import dc.iface.login.LoginActivity;
 import dc.iface.student.ChangePswActivity;
 
@@ -25,11 +21,12 @@ public class MainFragmentUser extends Fragment {
     private String userId;
     private String userName;
     //单例模式
-    public static MainFragmentUser getMainFragment(String teacherId){
+    public static MainFragmentUser getMainFragment(String teacherId, String userName){
         if(mf == null){
             mf = new MainFragmentUser();
         }
-        mf.id=Integer.parseInt( teacherId );
+        mf.userId= teacherId ;
+        mf.userName=userName ;
         return mf;
     }
 
@@ -40,54 +37,11 @@ public class MainFragmentUser extends Fragment {
         TextView xuehao_text = view.findViewById(R.id.xuehao_text);
         TextView name_text = view.findViewById(R.id.name_text);
 
-
-
-        new Thread( new Runnable() {
-            @Override
-            public void run() {
-
-
-                //建立一个查询操作
-                DBUtils dbUtils= new DBUtils();
-                String sql = "select  teacher_name from  teacher where teacher_id ="+id;
-                ResultSet resultSet = dbUtils.excuteSQL( sql );
-                try{
-                    resultSet.next();
-                    System.out.println( resultSet.getString("teacher_name") );
-                    if(resultSet!=null) {
-                        userId =String.valueOf( id );
-                        userName =resultSet.getString( "teacher_name" );
-                        resultSet.getStatement().getConnection().close();
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    System.out.printf( e.getMessage() );
-                }
-
-            }
-        } ).start();
-
-
-
         xuehao_text.setText(userId);
         name_text.setText(userName);
 
         TextView zhuxiao_text = view.findViewById(R.id.zhuxiao_text);
         TextView xiugai_text  = view.findViewById(R.id.xiugai_text);
-
-
-        //TextView shangchuanzp_text  = view.findViewById(R.id.shangchuanzp_text);
-
-
-          /*  //上传个人照片功能（上传到服务器，人脸识别功能）
-            shangchuanzp_text.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //进入修改密码的功能界面
-                    Intent intent=new Intent(getActivity(), TakePhotoActivity.class);
-                    startActivity(intent);
-                }
-            });*/
 
 
         //修改密码功能

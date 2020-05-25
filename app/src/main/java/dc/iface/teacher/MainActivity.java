@@ -29,6 +29,7 @@ public class MainActivity extends BaseActivity {
     private RadioGroup MenuBarBelow;
     private ImageButton addClassbtn;
     String teacherId;
+    String userName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +44,7 @@ public class MainActivity extends BaseActivity {
 
         Intent intent =getIntent();
         teacherId = intent.getStringExtra( "teacherId" );
+        userName = intent.getStringExtra( "userName" );
         Log.i("MainActivity","1." + teacherId);
 
         MenuBarBelow = findViewById(R.id.MenuBarBelowQ);//下方菜单栏
@@ -91,7 +93,7 @@ public class MainActivity extends BaseActivity {
                 text_title.setText("课堂");//将当前Fragment的toolbar设置为相应的字样 如 ：“课堂”
                 break;
             case 1:
-                changeFragment(new MainFragmentUser().getMainFragment(teacherId));
+                changeFragment(new MainFragmentUser().getMainFragment(teacherId,userName));
                 text_title.setText("个人中心");
                 break;
             default:

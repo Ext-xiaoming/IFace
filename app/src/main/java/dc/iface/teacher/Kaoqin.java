@@ -86,7 +86,7 @@ public class Kaoqin extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG , "1"+ "进入跳转" );
-                Intent intent2 = new Intent(Kaoqin.this, PhotoActivity.class);
+                Intent intent2 = new Intent(Kaoqin.this, FaqianActivity.class);
                 intent2.putExtra("courseId",courseCode);
                 intent2.putExtra("teacherId",teacherId);
                 intent2.putExtra("flag","1");
@@ -101,9 +101,10 @@ public class Kaoqin extends BaseActivity {
             @Override
             public void onClick(View view) {
                 Log.i(TAG , "1"+ "进入跳转" );
-                Intent intent2 = new Intent(Kaoqin.this, FaceActivity.class);
+                Intent intent2 = new Intent(Kaoqin.this, PhotoActivity.class);
                 intent2.putExtra("courseId",courseCode);
                 intent2.putExtra("teacherId",teacherId);
+                intent2.putExtra("flag","1");
 
                 startActivity(intent2);
             }

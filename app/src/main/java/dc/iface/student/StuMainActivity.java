@@ -24,6 +24,7 @@ public class StuMainActivity  extends BaseActivity {
     //private String studentId = "160031111";
 
     private String studentId="";
+    private String userName="";
     private String TAG = "StuMainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class StuMainActivity  extends BaseActivity {
 
         Intent intent =getIntent();
         studentId = intent.getStringExtra( "studentId" );
+        userName = intent.getStringExtra( "userName" );
         Log.i(TAG,"1.**************************"+studentId);
 
 
@@ -85,12 +87,10 @@ public class StuMainActivity  extends BaseActivity {
             case 0:
                 System.out.printf( "----studentId="+studentId );
                 changeFragment(new StuMainFragmentClass().getMainFragment(studentId));
-                //Toast.makeText(StuMainActivity.this,  "学生", Toast.LENGTH_LONG).show();
                 text_title.setText("学生课堂");
                 break;
             case 1:
-                changeFragment(new StuMainFragmentUser().getMainFragment(studentId));
-                //Toast.makeText(StuMainActivity.this,  "老师", Toast.LENGTH_LONG).show();
+                changeFragment(new StuMainFragmentUser().getMainFragment(studentId,userName));
                 text_title.setText("个人中心");
                 break;
             default:

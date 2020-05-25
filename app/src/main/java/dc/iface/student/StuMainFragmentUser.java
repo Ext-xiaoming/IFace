@@ -6,19 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.fragment.app.Fragment;
-
-import java.sql.ResultSet;
 import dc.iface.BaseActivity.ActivityCollectorUtil;
 import dc.iface.BaseActivity.StatisClass;
 import dc.iface.R;
-import dc.iface.SQL.DBUtils;
 import dc.iface.TakePhotos.PhotoActivity;
-import dc.iface.TakePhotos.TakePhotoActivity;
 import dc.iface.login.LoginActivity;
-
-
 
 public class StuMainFragmentUser extends Fragment {
     private static StuMainFragmentUser mf;
@@ -26,11 +19,12 @@ public class StuMainFragmentUser extends Fragment {
     private String userId;
     private String userName;
     //单例模式
-    public static StuMainFragmentUser getMainFragment(String studentId){
+    public static StuMainFragmentUser getMainFragment(String studentId,String userName){
         if(mf == null){
             mf = new StuMainFragmentUser();
         }
-        mf.id=Integer.parseInt( studentId );
+        mf.userId= studentId ;
+        mf.userName= userName ;
         return mf;
     }
 
@@ -40,34 +34,6 @@ public class StuMainFragmentUser extends Fragment {
 
         TextView xuehao_text = view.findViewById(R.id.stuxuehao_text);
         TextView name_text = view.findViewById(R.id.stuname_text);
-
-        new Thread( new Runnable() {
-            @Override
-            public void run() {
-                //建立一个查询操作
-                DBUtils dbUtils= new DBUtils();
-                String sql = "select  student_name from  student where student_id ="+id;
-                System.out.printf( sql );
-                ResultSet resultSet = dbUtils.excuteSQL( sql );
-                try{
-                    resultSet.next();
-                    System.out.println( resultSet.getString("student_name") );
-                    if(resultSet!=null) {
-                        userId =String.valueOf( id );
-                        userName =resultSet.getString( "student_name" );
-                        resultSet.getStatement().getConnection().close();
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    System.out.printf( e.getMessage() );
-                }
-
-            }
-        } ).start();
-
-
-
-
 
         xuehao_text.setText(userId);
         name_text.setText(userName);

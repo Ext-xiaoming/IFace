@@ -232,15 +232,11 @@ public class FaqianActivity extends BaseActivity {
         return postNum;
     }
 
-
-
-
-
     public static String getSmallLetter(int size){//随机生成size位数字字符串
         StringBuffer buffer = new StringBuffer();
         Random random = new Random();
         for(int i=0; i<size;i++){
-            buffer.append( (random.nextInt(10) ) );
+            buffer.append( random.nextInt(10) +1);
         }
         return buffer.toString();
     }
