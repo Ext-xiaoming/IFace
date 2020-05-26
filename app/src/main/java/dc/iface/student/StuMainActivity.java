@@ -21,10 +21,9 @@ import dc.iface.R;
 public class StuMainActivity  extends BaseActivity {
     private RadioGroup MenuBarBelow;
     private ImageButton addClassbtn;
-    //private String studentId = "160031111";
 
-    private String studentId="";
-    private String userName="";
+    private String studentId;
+    private String userName;
     private String TAG = "StuMainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +36,12 @@ public class StuMainActivity  extends BaseActivity {
 
         Log.i(TAG,"1.**************************");
         MenuBarBelow = findViewById(R.id.MenuBarBelowQ);//下方菜单栏
-        setIndexSelected(0);//默认class
 
         Intent intent =getIntent();
         studentId = intent.getStringExtra( "studentId" );
         userName = intent.getStringExtra( "userName" );
         Log.i(TAG,"1.**************************"+studentId);
+        setIndexSelected(0);//默认class
 
 
         //Toast.makeText(StuMainActivity.this,  studentId, Toast.LENGTH_LONG).show();

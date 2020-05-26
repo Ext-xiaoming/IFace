@@ -1,8 +1,10 @@
 package dc.iface.teacher;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -11,14 +13,28 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 
 import dc.iface.BaseActivity.BaseActivity;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
+import dc.iface.login.LoginActivity;
+import dc.iface.object.CourseListItem;
+import dc.iface.student.KaoqinActivity;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static dc.iface.Server.URI.server;
 
 
 public class AddcourseActivity extends BaseActivity {
@@ -58,64 +74,87 @@ public class AddcourseActivity extends BaseActivity {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                    new Thread( new Runnable() {
-                        @Override
-                        public void run() {
-                            courseName = coursename.getText().toString();
-                            VerificationCode = yanzhengma.getText().toString();
-                            if (VerificationCode.length() == 4 && !courseName.isEmpty()){
-                                //①、课程验证码四位，名称不为空
-                                //②、查询是否已经存在该验证码
-                            try
-                            {
-                                DBUtils dbUtils= new DBUtils();
-                                String sql = "select course_id from  course where course_id ="+VerificationCode;
-                                System.out.printf( sql );
-                                ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-                                if(resultSet.next()){
-                                    //以及存在该注册码，不能再次注册
-                                    Looper.prepare();
-                                    Toast.makeText(AddcourseActivity.this, "课证码已经被注册！", Toast.LENGTH_SHORT).show();
-                                    Looper.loop();
-                                    resultSet.getStatement().getConnection().close();
-                                }else {
-                                    //该注册码可以注册
-                                    sql = "insert into course  (course_id , course_name,teacher_id)" +
-                                            "values ("+ VerificationCode + ",'" + courseName + "','" + teacherId +"')";
-
-                                    System.out.printf( sql );
-                                    int count = dbUtils.excuteSQLToADU( sql );
-
-                                    if(count!=0) {
-                                        Looper.prepare();
-                                        Toast.makeText(AddcourseActivity.this, "加入成功", Toast.LENGTH_LONG).show();
-                                        Looper.loop();
-                                        Intent intent=new Intent(AddcourseActivity.this, MainActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }else {
-                                        Looper.prepare();
-                                        Toast.makeText(AddcourseActivity.this, "发布课程失败！" , Toast.LENGTH_LONG).show();
-                                        Looper.loop();
-                                    }
-                                }
-                            }catch(Exception e){
-                                e.printStackTrace();
-                                System.out.printf( e.getMessage() );
-                            }
-
-                        }else{
-                            Looper.prepare();
-                            Toast.makeText(AddcourseActivity.this, "课证码4位哦,并且所填项不能为空哦！", Toast.LENGTH_LONG).show();
-                            Looper.loop();
-                            }
-                       }
-                    } ).start();
-
-
+                toAddCourse();
             }
         });
     }
+
+
+    public void toAddCourse() {
+        courseName = coursename.getText().toString();
+        VerificationCode = yanzhengma.getText().toString();
+        if (VerificationCode.length() == 4 && !courseName.isEmpty()){
+
+            //①、课程验证码四位，名称不为空
+            //②、查询是否已经存在该验证码
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OkHttpClient client = new OkHttpClient();
+                    FormBody body = new FormBody.Builder()
+                            .add("courseId",VerificationCode)
+                            .add("courseName",courseName)
+                            .add("teacherId",teacherId)
+
+                            .build();
+
+                    final Request request = new Request.Builder()
+                            .url(server+"teaPostCourse/")
+                            .post(body)
+                            .build();
+                    Call call = client.newCall(request);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            System.out.printf( "失败！" );
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText( AddcourseActivity.this, "网络请求失败！" , Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if(response.isSuccessful()){
+                                final String result = response.body().string();
+                                parseJSONWithJSONObject(result);
+                                Log.d( "AddcourseActivity", result );
+                            }
+                        }
+                    });
+
+                }
+            }).start();
+        }
+    }
+
+    //json解析
+    private void parseJSONWithJSONObject(String jsonData){
+        try {
+            JSONObject jsonObject= new JSONObject( jsonData );
+            int res =jsonObject.getInt( "RESULT" );
+            HandleResponse(res);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void HandleResponse(final int res) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(res==1){
+                    Toast.makeText( AddcourseActivity.this, "发布课程成功！" , Toast.LENGTH_LONG).show();
+                }else if(res==0){
+                    Toast.makeText( AddcourseActivity.this, "课程码已经被注册！" , Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText( AddcourseActivity.this, "发布课程失败！" , Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+
+
 }

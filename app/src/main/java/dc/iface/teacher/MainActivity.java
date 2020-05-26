@@ -28,8 +28,8 @@ import dc.iface.R;
 public class MainActivity extends BaseActivity {
     private RadioGroup MenuBarBelow;
     private ImageButton addClassbtn;
-    String teacherId;
-    String userName;
+    private String teacherId;
+    private String userName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,18 +38,13 @@ public class MainActivity extends BaseActivity {
             getSupportActionBar().hide();
         }
         setContentView( R.layout.activity_main);
-
-        //Bmob.initialize(this, "b8f3d15f3fb6660271320962b729a210");//Bmob的初始化
-        //myUser= BmobUser.getCurrentUser(MyUser.class);
-
+        MenuBarBelow = findViewById(R.id.MenuBarBelowQ);//下方菜单栏
         Intent intent =getIntent();
         teacherId = intent.getStringExtra( "teacherId" );
         userName = intent.getStringExtra( "userName" );
         Log.i("MainActivity","1." + teacherId);
 
-        MenuBarBelow = findViewById(R.id.MenuBarBelowQ);//下方菜单栏
         setIndexSelected(0);//默认class
-
         //底部菜单栏
         MenuBarBelow.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {//菜单栏下方按钮选择后跳转
             @Override

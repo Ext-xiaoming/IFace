@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -26,6 +27,10 @@ import com.baidu.mapapi.map.MapStatusUpdateFactory;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +40,14 @@ import java.util.Random;
 import dc.iface.BaseActivity.BaseActivity;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static dc.iface.Server.URI.server;
 
 
 public class FaqianActivity extends BaseActivity {
@@ -117,126 +130,96 @@ public class FaqianActivity extends BaseActivity {
 
         Intent KQToStatus = getIntent();
         courseCode = KQToStatus.getStringExtra("courseId");//课程码匹配
-        final int coursecode=Integer.parseInt(courseCode);
 
         okqd =findViewById(R.id.okQiandao);//确认签到
         okqd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                // 需要有post_id（查询，如果有则加1 ，没有则 默认从0 开始）
-
-
-                System.out.printf("FaqianActivity  开启数据库线程！\n");
-                new Thread( new Runnable() {
-                    @Override
-                    public void run() {
-
-                        System.out.printf("FaqianActivity  开启数据库线程！\n");
-                        final int postID=Integer.parseInt( RandNum );
-
-                        //生成当前时间
-                        SimpleDateFormat formatter   =   new   SimpleDateFormat("yyyyMMddHHmm");
-                        Date curDate =  new Date(System.currentTimeMillis());
-                        final String   curTime   =   formatter.format(curDate);
-
-                        // teacher_id（通过查询 course_id得到）
-                        final int teacherID = QueryTeacherId(coursecode);
-
-                        // post_type（通过直接指定）
-                        final  int post_type =0;//普通签到
-                        // post_num(通过查询post_check_in 中同一个course_id 下的最大 post_num)
-                        final  int postNum = QueryPostNum(coursecode)+1;
-
-                        DBUtils dbUtils= new DBUtils();
-                        String sql = "insert into post_check_in  (post_id , post_date,teacher_id,post_num,course_id," +
-                                "post_type,post_longitude,post_latitude)" +
-                                "values ("+ postID + ",'" + curTime + "'," + teacherID +","+ postNum+ ","+coursecode +","+post_type+",'"
-                                + sbjingdu2+"','"+ sbweidu2+ "')";
-                        System.out.printf( sql );
-
-
-                        int count  = dbUtils.excuteSQLToADU( sql );
-
-                        try{
-                            if(count!=0) {
-                                Looper.prepare();
-                                Toast.makeText(FaqianActivity.this, "发布签到成功", Toast.LENGTH_LONG).show();
-                                Looper.loop();
-                            }else {
-                                Looper.prepare();
-                                Toast.makeText(FaqianActivity.this, "发布签到失败", Toast.LENGTH_LONG).show();
-                                Looper.loop();
-                            }
-                        }catch (Exception e){
-                            e.printStackTrace();
-                            System.out.printf( e.getMessage() );
-                        }
-
-                    }
-                } ).start();
-
-            }
+            public void onClick(View view) {toPostNumCheck();}
 
         });
     }
 
 
-    // teacher_id（通过查询 course_id得到）
-    public int QueryTeacherId(int course_id)
-    {
-        int teacher_id=0;
+    public void toPostNumCheck() {
+        SimpleDateFormat formatter   =   new   SimpleDateFormat("yyyyMMddHHmm");
+        Date curDate =  new Date(System.currentTimeMillis());
+        final String   curTime   =   formatter.format(curDate);
 
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select teacher_id from course where course_id="+course_id;
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OkHttpClient client = new OkHttpClient();
+                    FormBody body = new FormBody.Builder()
+                            .add("post_id",RandNum)
+                            .add("post_date",curTime)
+                            .add("course_id",courseCode)
+                            .add("post_longitude", String.valueOf( sbjingdu2 ) )
+                            .add("post_latitude", String.valueOf( sbweidu2 ) )
+                            .build();
 
-        try{
+                    final Request request = new Request.Builder()
+                            .url(server+"teaPostNumCheck/")
+                            .post(body)
+                            .build();
+                    Call call = client.newCall(request);
+                    call.enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            System.out.printf( "失败！" );
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText( FaqianActivity.this, "网络请求失败！" , Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if(response.isSuccessful()){
+                                final String result = response.body().string();
+                                parseJSONWithJSONObject(result);
+                                Log.d( "FaqianActivity", result );
+                            }
+                        }
+                    });
 
-            if(resultSet.next()) {
-                teacher_id=resultSet.getInt( "teacher_id" );
-                resultSet.getStatement().getConnection().close();
-            }
-            else{
-                System.out.printf("未知错误");
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.printf( e.getMessage() );
-        }
-        return teacher_id;
+                }
+            }).start();
+
     }
 
-    // // （查询，如果有则加1 ，没有则 默认从0 开始）
-    // post_num(通过查询post_check_in 中同一个course_id 下的最大 post_num)
-    public int QueryPostNum(int course_id)
-    {
-        int postNum=0;
-
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select max(post_num) from post_check_in where course_id= "+course_id;
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-
-            if(resultSet.next()) {
-                postNum=resultSet.getInt( "max(post_num)" );
-                resultSet.getStatement().getConnection().close();
-            }
-            else{
-                postNum=0;
-            }
+    //json解析
+    private void parseJSONWithJSONObject(String jsonData){
+        try {
+            JSONObject jsonObject= new JSONObject( jsonData );
+            int res =jsonObject.getInt( "RESULT" );
+            HandleResponse(res);
         }catch (Exception e){
             e.printStackTrace();
-            System.out.printf( e.getMessage() );
         }
-        return postNum;
     }
+
+    private void HandleResponse(final int res) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(res==1){
+                    Toast.makeText( FaqianActivity.this, "发布数字签到成功！" , Toast.LENGTH_LONG).show();
+                }else if(res==0){
+                    Toast.makeText( FaqianActivity.this, "数字签到已经发布！" , Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText( FaqianActivity.this, "发布签到失败！" , Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
 
     public static String getSmallLetter(int size){//随机生成size位数字字符串
         StringBuffer buffer = new StringBuffer();
         Random random = new Random();
         for(int i=0; i<size;i++){
-            buffer.append( random.nextInt(10) +1);
+            buffer.append( random.nextInt(9) +1);
         }
         return buffer.toString();
     }
@@ -379,4 +362,57 @@ public class FaqianActivity extends BaseActivity {
         super.onPause();
         mapView.onPause();
     }
+
+
+
+      /* // teacher_id（通过查询 course_id得到）
+    public int QueryTeacherId(int course_id)
+    {
+        int teacher_id=0;
+
+        DBUtils dbUtils= new DBUtils();
+        String sql = "select teacher_id from course where course_id="+course_id;
+        ResultSet resultSet = dbUtils.excuteSQL( sql );
+
+        try{
+
+            if(resultSet.next()) {
+                teacher_id=resultSet.getInt( "teacher_id" );
+                resultSet.getStatement().getConnection().close();
+            }
+            else{
+                System.out.printf("未知错误");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.printf( e.getMessage() );
+        }
+        return teacher_id;
+    }
+
+    // // （查询，如果有则加1 ，没有则 默认从0 开始）
+    // post_num(通过查询post_check_in 中同一个course_id 下的最大 post_num)
+    public int QueryPostNum(int course_id)
+    {
+        int postNum=0;
+
+        DBUtils dbUtils= new DBUtils();
+        String sql = "select max(post_num) from post_check_in where course_id= "+course_id;
+        ResultSet resultSet = dbUtils.excuteSQL( sql );
+
+        try{
+
+            if(resultSet.next()) {
+                postNum=resultSet.getInt( "max(post_num)" );
+                resultSet.getStatement().getConnection().close();
+            }
+            else{
+                postNum=0;
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.printf( e.getMessage() );
+        }
+        return postNum;
+    }*/
 }

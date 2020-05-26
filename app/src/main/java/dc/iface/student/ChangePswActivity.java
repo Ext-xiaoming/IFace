@@ -32,6 +32,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static dc.iface.Server.URI.server;
+
 
 public class ChangePswActivity extends BaseActivity implements View.OnClickListener{
 
@@ -116,7 +118,7 @@ public class ChangePswActivity extends BaseActivity implements View.OnClickListe
                         .build();
 
                 final Request request = new Request.Builder()
-                        .url("http://10.34.15.176:8000/changePassward/")
+                        .url(server+"changePassward/")
                         .post(body)
                         .build();
                 Call call = client.newCall(request);

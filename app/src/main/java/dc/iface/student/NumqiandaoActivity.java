@@ -42,6 +42,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static dc.iface.Server.URI.server;
+
 
 public class NumqiandaoActivity extends BaseActivity  implements View.OnClickListener{
     private static final String DECODED_CONTENT_KEY = "codedContent";
@@ -177,7 +179,7 @@ public class NumqiandaoActivity extends BaseActivity  implements View.OnClickLis
                         .build();
 
                 final Request request = new Request.Builder()
-                        .url("http://10.34.15.176:8000/verIsCheck/")
+                        .url(server+"verIsCheck/")
                         .post(body)
                         .build();
                 Call call = client.newCall(request);

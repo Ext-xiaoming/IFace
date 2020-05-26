@@ -11,6 +11,8 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,13 +36,18 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static dc.iface.Server.URI.server;
+
 
 public class MainFragmentClass extends Fragment {
     private static MainFragmentClass mf;
     private static String TAG = "MainFragmentClass";
     private String  teacherId;
     private String teacherName;
-    private ListView lvListView ;
+
+    private RecyclerView recyclerView ;
+    private List<CourseListItem> listItemCourses;
+    private CoursesAdapter coursesAdapter;
     //单例模式
     public static MainFragmentClass getMainFragment(String studentId){
         if(mf == null){
@@ -54,14 +61,14 @@ public class MainFragmentClass extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate( R.layout.main_fragment_class ,container, false);//fragment_message为底部栏的界面
 
-        lvListView = view.findViewById(R.id.course_list);
+        recyclerView = view.findViewById(R.id.course_list);
 
         Log.i(TAG,"进入onCreateView");
         //从 course表中查找并以列表的形式显示出来
-        final List<CourseListItem> listItemCourses = new ArrayList<>();//ListItem课程集
-        LodeListView(listItemCourses);
 
-        lvListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        LodeListView();
+
+        /*recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int position,
                                     long arg3) {
@@ -72,13 +79,13 @@ public class MainFragmentClass extends Fragment {
                 intent.putExtra("courseId", listItemCourses.get(position).getCourseId());
                 startActivity(intent);
             }
-        });
+        });*/
 
         return view;
     }
 
     //加载ListView
-    private void LodeListView(final List<CourseListItem> listItemCourses){
+    private void LodeListView(){
         /**
          * 传递 teacherId 、
          * 获取 course_name、course_id、teacher_name
@@ -94,7 +101,7 @@ public class MainFragmentClass extends Fragment {
                         .build();
 
                 final Request request = new Request.Builder()
-                        .url("http://10.34.15.176:8000/lodeTeaCourseList/")
+                        .url(server+"lodeTeaCourseList/")
                         .post(body)
                         .build();
                 Call call = client.newCall(request);
@@ -114,7 +121,7 @@ public class MainFragmentClass extends Fragment {
                     public void onResponse(Call call, Response response) throws IOException {
                         if(response.isSuccessful()){
                             final String result = response.body().string();
-                            parseJSONWithJSONObjectArray(result,listItemCourses);
+                            parseJSONWithJSONObjectArray(result);
                             Log.d( "MainFragmentClass", result );
                         }
                     }
@@ -126,8 +133,9 @@ public class MainFragmentClass extends Fragment {
     }
 
     //json解析  + 适配器数据分发       * 获取 course_name、course_id、teacher_name
-    private void parseJSONWithJSONObjectArray(String jsonData,List<CourseListItem> listItemCourses){
+    private void parseJSONWithJSONObjectArray(String jsonData){
         try {
+            listItemCourses = new ArrayList<>();//ListItem课程集
             JSONArray jsonArray = new JSONArray( jsonData );
             for (int i=0 ;i<jsonArray.length();i++){
                 JSONObject jsonObject = jsonArray.getJSONObject( i );
@@ -145,16 +153,16 @@ public class MainFragmentClass extends Fragment {
                 item.setTeacherName(teacher_name);
                 listItemCourses.add(item);
             }
-            CoursesAdapter coursesAdapter = new CoursesAdapter(getActivity() ,
+            coursesAdapter = new CoursesAdapter(getActivity() ,
                     R.layout.course_item , listItemCourses);//MainActivity.this = getActivity ()
-            HandleResponse(coursesAdapter,listItemCourses);
+            HandleResponse();
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
     //显示
-    private void HandleResponse(final CoursesAdapter coursesAdapter, final List<CourseListItem> listItemCourses) {
+    private void HandleResponse() {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -162,7 +170,21 @@ public class MainFragmentClass extends Fragment {
                     CourseListItem s = (CourseListItem)listItemCourses.get(i);
                     System.out.println(i+"输出："+s.getCourseId()+"  "+s.getCourseName()+"  "+s.getTeacherName()+"\n");
                 }
-                lvListView.setAdapter(coursesAdapter);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager( getContext() );
+                recyclerView.setLayoutManager( linearLayoutManager );
+                recyclerView.setAdapter(coursesAdapter);
+                coursesAdapter.setOnItemClickListener( new CoursesAdapter.OnitemClick(){
+                    @Override
+                    public void onItemClick(int position) {
+                        Intent intent = new Intent(getActivity () , Kaoqin.class);//考勤界面
+                        intent.putExtra("teacherId",teacherId);
+                        intent.putExtra("teacherName", listItemCourses.get(position).getTeacherName());
+                        intent.putExtra("courseName", listItemCourses.get(position).getCourseName());
+                        intent.putExtra("courseId", listItemCourses.get(position).getCourseId());
+                        startActivity(intent);
+                    }
+                } );
+
             }
         });
     }

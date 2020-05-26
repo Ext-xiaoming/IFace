@@ -47,6 +47,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static dc.iface.Server.URI.server;
 import static dc.iface.teacher.FaqianActivity.getSmallLetter;
 
 public class PhotoActivity extends AppCompatActivity implements View.OnClickListener{
@@ -265,7 +266,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
                 System.out.printf( "111111111111111111" );
                 Request request = new Request.Builder()
-                        .url("http://10.34.15.176:8000/savePictures/")
+                        .url(server+"savePictures/")
                         .post(requestBody)
                         .build();
                 Call call = client.newCall(request);
@@ -352,7 +353,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
                 System.out.printf( "111111111111111111" );
                 Request request = new Request.Builder()
-                        .url("http://10.34.15.176:8000/savePictures/")
+                        .url(server+"savePictures/")
                         .post(requestBody)
                         .build();
                 Call call = client.newCall(request);

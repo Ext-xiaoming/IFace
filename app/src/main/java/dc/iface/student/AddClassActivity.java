@@ -13,11 +13,23 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.sql.ResultSet;
 
 import dc.iface.BaseActivity.BaseActivity;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
+import dc.iface.teacher.AddcourseActivity;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static dc.iface.Server.URI.server;
 
 public class AddClassActivity extends BaseActivity {
     private Button subBtn;
@@ -60,71 +72,83 @@ public class AddClassActivity extends BaseActivity {
         subBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final  int student_id=Integer.parseInt( studentId );
-                number = editText.getText().toString();//课程码
-                if(number.length() == 4){
-                    //查询是否已经加入该班级
-                    final int course_id= Integer.parseInt(number) ;
+                toAddClass();
+            }
+        });
+    }
 
-                    new Thread( new Runnable() {
+    public void toAddClass() {
+        number = editText.getText().toString();//课程码
+        if(number.length() == 4){
+            //查询是否已经加入该班级
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OkHttpClient client = new OkHttpClient();
+                    FormBody body = new FormBody.Builder()
+                            .add("courseId",number)
+                            .add("studentId",studentId)
+                            .build();
+
+                    final Request request = new Request.Builder()
+                            .url(server+"stuAddCourse/")
+                            .post(body)
+                            .build();
+                    Call call = client.newCall(request);
+                    call.enqueue(new Callback() {
                         @Override
-                        public void run() {
-                            DBUtils dbUtils= new DBUtils();
-                            String sql = "select student_id from  student_course where course_id ="+course_id;
-                            System.out.printf( sql );
-                            ResultSet resultSet = dbUtils.excuteSQL( sql );
-                            try
-                            {
-                                while(resultSet.next()){
-                                    if(student_id==resultSet.getInt( "student_id" )){
-                                        //学生已经加课不用重复加入
-                                        Looper.prepare();
-                                        Toast.makeText(AddClassActivity.this, "已经加入，不用重复加入！", Toast.LENGTH_SHORT).show();
-                                        Looper.loop();
-                                        resultSet.getStatement().getConnection().close();
-                                        break;
-                                    }
+                        public void onFailure(Call call, IOException e) {
+                            System.out.printf( "失败！" );
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText( AddClassActivity.this, "网络请求失败！" , Toast.LENGTH_LONG).show();
                                 }
-
-
-                                final  int stu_course_id = QueryStuCourseId()+1;
-                                //可以加课
-                                sql = "insert into student_course  (stu_course_id , course_id,student_id)" +
-                                        "values ("+ stu_course_id + "," + course_id + "," + student_id  + ")";
-                                System.out.printf( sql );
-                                int count = dbUtils.excuteSQLToADU( sql );
-
-                                if(count!=0) {
-                                    //********************************************************************************************
-                                    //这里如果添加成功的话，结束当前添加课程的界面，进入主页面显示加入后的班级列表情况
-
-                                    Looper.prepare();
-                                    Toast.makeText(AddClassActivity.this, "加入成功", Toast.LENGTH_LONG).show();
-                                    Looper.loop();
-                                    finish();
-                                    //********************************************************************************************
-                                }else {
-                                    Looper.prepare();
-                                    Toast.makeText(AddClassActivity.this, "加课码错误，请重新输入！", Toast.LENGTH_LONG).show();
-                                    Looper.loop();
-                                }
-
-                            }catch(Exception e){
-                                e.printStackTrace();
-                                System.out.printf( e.getMessage() );
+                            });
+                        }
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            if(response.isSuccessful()){
+                                final String result = response.body().string();
+                                parseJSONWithJSONObject(result);
+                                Log.d( "AddClassActivity", result );
                             }
                         }
-                    } ).start();
+                    });
 
-                } else{
-                    Toast.makeText(AddClassActivity.this, "课堂验证码四位哦", Toast.LENGTH_LONG).show();
-                    editText.setText("");//清空
+                }
+            }).start();
+        }
+    }
+
+    //json解析
+    private void parseJSONWithJSONObject(String jsonData){
+        try {
+            JSONObject jsonObject= new JSONObject( jsonData );
+            int res =jsonObject.getInt( "RESULT" );
+            HandleResponse(res);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void HandleResponse(final int res) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(res==1){
+                    Toast.makeText( AddClassActivity.this, "加入课程成功！" , Toast.LENGTH_LONG).show();
+                }else if(res==0){
+                    Toast.makeText( AddClassActivity.this, "课程已经加入！" , Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText( AddClassActivity.this, "加入课程失败！" , Toast.LENGTH_LONG).show();
                 }
             }
         });
     }
 
-    public int QueryStuCourseId()
+
+   /* public int QueryStuCourseId()
     {
         int stu_course_id=0;
 
@@ -147,5 +171,5 @@ public class AddClassActivity extends BaseActivity {
             System.out.printf( e.getMessage() );
         }
         return stu_course_id;
-    }
+    }*/
 }

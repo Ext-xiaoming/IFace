@@ -11,6 +11,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +25,22 @@ import java.util.List;
 import dc.iface.BaseActivity.BaseActivity;
 import dc.iface.R;
 import dc.iface.SQL.DBUtils;
+import dc.iface.object.AdapterKaoqin;
 import dc.iface.object.AdapterQStatus;
+import dc.iface.object.ListItemKaoqin;
 import dc.iface.object.QStatusItem;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import static dc.iface.Server.URI.server;
 
 
 public class QiandaoStatus extends BaseActivity {
 
-    private ListView lvListView;
     private TextView biaoti;
     private ImageButton back;
 
@@ -32,8 +48,11 @@ public class QiandaoStatus extends BaseActivity {
     private String courseCode;//课程码
     private String TAG ="QiandaoStatus";
     private String postId;
-    private List<QStatusItem> ListQStatusItem =new ArrayList<>();
+    private List<QStatusItem> ListQStatusItem ;
     private AdapterQStatus adapterQStatus;
+    private RecyclerView recyclerView;
+
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -49,7 +68,7 @@ public class QiandaoStatus extends BaseActivity {
         courseCode = KQToStatus.getStringExtra("courseId");//课程码匹配
         postId=KQToStatus.getStringExtra("postId");
 
-        lvListView = findViewById(R.id.statusItem);
+        recyclerView = findViewById(R.id.statusItem);
 
         biaoti = findViewById(R.id.title_sec);
         biaoti.setText("第"+checkNum+"次签到");
@@ -65,83 +84,108 @@ public class QiandaoStatus extends BaseActivity {
             }
         });
 
-
-        new Thread( new Runnable() {
-            @Override
-            public void run() {
-
-                //查找该课程所有的学生的学号  姓名
-                //查看该次签到该学生是否签到了
-
-                DBUtils dbUtils= new DBUtils();
-
-                String sql = "select student_id  from  student_course where course_id ="+courseCode;
-                System.out.printf(sql );
-                ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-                try{
-
-                    while(resultSet.next()){
-                        QStatusItem item = new QStatusItem();
-                        item.setStudentId( resultSet.getString("student_id") );
-                        System.out.printf(  "student_id= "+ resultSet.getString("student_id") );
-
-                        item.setName(QueryStudentName( resultSet.getString("student_id")));
-                        //System.out.printf(  "student_name= "+ resultSet.getString("student_name") );
-
-                        if(IsAttendance(resultSet.getString("student_id"), postId ))
-                        {
-                            item.setCheckStatu("出勤");
-                        }else{
-                            item.setCheckStatu("缺勤");
-                        }
-
-
-                        ListQStatusItem.add(item);
-                    }
-
-                    for (int i = 0; i < ListQStatusItem.size(); i++) {
-                        QStatusItem s = (QStatusItem)ListQStatusItem.get(i);
-                        System.out.println(i+"输出："+s.getStudentId()+"  "+s.getCheckStatu()+"  "+s.getName()+"\n");
-                    }
-
-                    adapterQStatus = new AdapterQStatus(QiandaoStatus.this ,
-                            R.layout.item_status , ListQStatusItem);
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println( "list.size="+ListQStatusItem.size()+"--00000000000000\n");
-                            for (int i = 0; i < ListQStatusItem.size(); i++) {
-                                QStatusItem s = (QStatusItem)ListQStatusItem.get(i);
-                                System.out.println(i+"输出："+s.getStudentId()+"  "+s.getCheckStatu()+"  "+s.getName()+"\n");
-                            }
-                            lvListView.setAdapter(adapterQStatus);                        }
-                    });
-
-                    resultSet.getStatement().getConnection().close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                    System.out.printf( e.getMessage() );
-                }
-            }
-        } ).start();
-
-        Log.i(TAG , "4.end" );
-        //**********************************************************************************************************
-        //修改状况，签到成功  失败
-        //**********************************************************************************************************
-        lvListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {//状况修改，出勤或迟到
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position,
-                                    long arg3) {
-                //状况修改，出勤或迟到
-            }
-        });
+        LodeListView();
 
     }
 
-    public boolean IsAttendance(String studentId,String postId){
+
+
+    public void LodeListView(){
+        /**
+         * 传递  courseId
+         * 获取  student_id student_name CheckStatu
+         * */
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpClient client = new OkHttpClient();
+                FormBody body = new FormBody.Builder()
+                        .add("courseId",courseCode)
+                        .add("postId",postId)
+
+                        .build();
+
+                final Request request = new Request.Builder()
+                        .url(server+"whoQiandao/")
+                        .post(body)
+                        .build();
+                Call call = client.newCall(request);
+                call.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        System.out.printf( "失败！" );
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                System.out.printf( "网络请求是失败" );
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if(response.isSuccessful()){
+                            final String result = response.body().string();
+                            parseJSONWithJSONObjectArray(result);
+                            Log.d( "QiandaoStatus", result );
+                        }
+                    }
+                });
+
+            }
+        }).start();
+    }
+    //json解析  + 适配器数据分发
+    private void parseJSONWithJSONObjectArray(String jsonData){
+        ListQStatusItem=new ArrayList<>( );
+        try {
+
+            JSONArray jsonArray = new JSONArray( jsonData );
+            for (int i=0 ;i<jsonArray.length();i++){
+                JSONObject jsonObject = jsonArray.getJSONObject( i );
+
+                String student_id=jsonObject.getString( "student_id" );
+                String student_name =jsonObject.getString( "student_name" );
+                String CheckStatu =jsonObject.getString( "CheckStatu" );
+                QStatusItem item = new QStatusItem();
+                item.setStudentId( student_id );
+                item.setName(student_name);
+                item.setCheckStatu(CheckStatu);
+
+                ListQStatusItem.add(item);
+            }
+            adapterQStatus = new AdapterQStatus(QiandaoStatus.this ,
+                    R.layout.item_status , ListQStatusItem);
+            HandleResponse();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    //显示
+    private void HandleResponse() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println( "list.size="+ListQStatusItem.size()+"--00000000000000\n");
+                for (int i = 0; i < ListQStatusItem.size(); i++) {
+                    QStatusItem s = (QStatusItem)ListQStatusItem.get(i);
+                    System.out.println(i+"输出："+s.getStudentId()+"  "+s.getCheckStatu()+"  "+s.getName()+"\n");
+                }
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager( QiandaoStatus.this );
+                recyclerView.setLayoutManager( linearLayoutManager );
+                recyclerView.setAdapter(adapterQStatus);
+
+                adapterQStatus.setOnItemClickListener( new AdapterQStatus.OnitemClick(){
+                    @Override
+                    public void onItemClick(int position) {
+                        //........
+                    }
+                } );
+            }
+        });
+    }
+/*    public boolean IsAttendance(String studentId,String postId){
         boolean flag=true;//出勤
 
         DBUtils dbUtils= new DBUtils();
@@ -194,7 +238,69 @@ public class QiandaoStatus extends BaseActivity {
         }
 
         return  studentName;
-    }
-
-
+    }*/
 }
+/*
+        new Thread( new Runnable() {
+            @Override
+            public void run() {
+
+                //查找该课程所有的学生的学号  姓名
+                //查看该次签到该学生是否签到了
+
+                DBUtils dbUtils= new DBUtils();
+
+                String sql = "select student_id  from  student_course where course_id ="+courseCode;
+                System.out.printf(sql );
+                ResultSet resultSet = dbUtils.excuteSQL( sql );
+
+                try{
+
+                    while(resultSet.next()){
+                        QStatusItem item = new QStatusItem();
+                        item.setStudentId( resultSet.getString("student_id") );
+                        System.out.printf(  "student_id= "+ resultSet.getString("student_id") );
+
+                        item.setName(QueryStudentName( resultSet.getString("student_id")));
+                        //System.out.printf(  "student_name= "+ resultSet.getString("student_name") );
+
+                        if(IsAttendance(resultSet.getString("student_id"), postId ))
+                        {
+                            item.setCheckStatu("出勤");
+                        }else{
+                            item.setCheckStatu("缺勤");
+                        }
+
+
+                        ListQStatusItem.add(item);
+                    }
+
+                    for (int i = 0; i < ListQStatusItem.size(); i++) {
+                        QStatusItem s = (QStatusItem)ListQStatusItem.get(i);
+                        System.out.println(i+"输出："+s.getStudentId()+"  "+s.getCheckStatu()+"  "+s.getName()+"\n");
+                    }
+
+                    adapterQStatus = new AdapterQStatus(QiandaoStatus.this ,
+                            R.layout.item_status , ListQStatusItem);
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.out.println( "list.size="+ListQStatusItem.size()+"--00000000000000\n");
+                            for (int i = 0; i < ListQStatusItem.size(); i++) {
+                                QStatusItem s = (QStatusItem)ListQStatusItem.get(i);
+                                System.out.println(i+"输出："+s.getStudentId()+"  "+s.getCheckStatu()+"  "+s.getName()+"\n");
+                            }
+                            LinearLayoutManager linearLayoutManager = new LinearLayoutManager( QiandaoStatus.this );
+                            recyclerView.setLayoutManager( linearLayoutManager );
+                            recyclerView.setAdapter(adapterQStatus);                        }
+                    });
+
+                    resultSet.getStatement().getConnection().close();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    System.out.printf( e.getMessage() );
+                }
+            }
+        } ).start();
+*/
