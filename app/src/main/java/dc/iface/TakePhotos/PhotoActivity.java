@@ -244,7 +244,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
          * 1、指定图片在服务器的保存地址 pic_server_path
          * 2、图片的类型（学生个人 or 班级照片）pic_tors
          * 3、图片命名规范--单独指定字段 pic_name
-         *
          */
         new Thread(new Runnable() {
             @Override
@@ -252,19 +251,28 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 OkHttpClient client = new OkHttpClient();
                 UriPathUtils uriPathUtils = new UriPathUtils();
                 imagePath= uriPathUtils.getRealPathFromUri(context,mUri);
-                System.out.printf(imagePath );
-                File file = new File( imagePath );
-                System.out.printf(file.getName().toString());
+
+                File file = null;
+
+                try {
+                    file  = new File( imagePath );
+                    Log.d( "PhotoActivity", file.getName().toString() );
+                }catch (Exception e){
+                    Log.d( "PhotoActivity","111" +e.getMessage() );
+                }
+
+
                 RequestBody image = RequestBody.create( MediaType.parse("image/jpg"), file);
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType( MultipartBody.FORM)
-                        .addFormDataPart("file", imagePath, image)
+                        .addFormDataPart("file", file.getName(), image)
                         .addFormDataPart( "studentId",studentId )
+                        .addFormDataPart( "file_name_InSFolder","1.jpg" )
                         .addFormDataPart( "file_save_path_InServer",file_save_path_InServer )
                         //.addFormDataPart( "file_name_InSFolder",file_name_InSFolder )
                         .build();
+                Log.d( "PhotoActivity", "111111111111111111" );
 
-                System.out.printf( "111111111111111111" );
                 Request request = new Request.Builder()
                         .url(server+"savePictures/")
                         .post(requestBody)
@@ -274,7 +282,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onFailure(Call call, IOException e) {
                         //...
-                        System.out.printf( "!!!!!!!!!!!!!!!!!!!失败" );
+                        Log.d( "PhotoActivity","222!!!!!!!!!!!!!!!!!!失败222222" );
                     }
 
                     @Override
@@ -284,6 +292,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                             try{
                                 JSONObject jsonObject= new JSONObject( result );
                                 int res =jsonObject.getInt( "RESULT" );
+                                Log.d( "PhotoActivity", "000"+result );
                                 if(res==1){
                                     //上传成功
                                     runOnUiThread(new Runnable() {
@@ -302,8 +311,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                                 }
                             }catch (Exception e){
                                 e.printStackTrace();
+                                Log.d( "PhotoActivity", "000"+ e.getMessage() );
                             }
-                            Log.d( "PhotoActivity", result );
                         }
                     }
                 });
@@ -342,7 +351,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 RequestBody image = RequestBody.create( MediaType.parse("image/jpg"), file);
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType( MultipartBody.FORM)
-                        .addFormDataPart("file", imagePath, image)
+                        .addFormDataPart("file", file.getName(), image)
                         .addFormDataPart( "postId",postId )
                         .addFormDataPart( "teacherId",teacherId )
                         .addFormDataPart( "class_index",courseId )

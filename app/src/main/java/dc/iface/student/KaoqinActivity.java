@@ -187,7 +187,7 @@ public class KaoqinActivity extends BaseActivity {
         try {
             listItemKaoqin = new ArrayList<>();//ListItem课程集
             JSONArray jsonArray = new JSONArray( jsonData );
-            for (int i= 0;i<jsonArray.length();i--){
+            for (int i= 0;i<jsonArray.length();i++){
                 ListItemKaoqin item = new ListItemKaoqin();
                 JSONObject jsonObject = jsonArray.getJSONObject( i );
                 String Check=jsonObject.getString( "IsCheck" );

@@ -1,5 +1,5 @@
 package dc.iface.Server;
 
 public class URI {
-    public static final String server="http://10.34.45.105:8000/";
+    public static final String server="http://47.115.6.199/";
 }
