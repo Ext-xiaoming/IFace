@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -52,6 +53,8 @@ public class StuMainFragmentClass extends Fragment {
         Log.i(TAG,"进入onCreateView :");
         final View view = inflater.inflate( R.layout.main_fragment_class ,container, false);//fragment_message为底部栏的界面
         recyclerView = view.findViewById(R.id.course_list);
+        //添加Android自带的分割线
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
         Log.i(TAG,"123."+"进入:"+studentId);
         //从 student_course表中查找并以列表的形式显示出来
 

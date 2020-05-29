@@ -23,6 +23,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.signature.StringSignature;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -125,7 +128,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 }else{
                     Intent intent = getIntent();
                     studentId = intent.getStringExtra("studentId");
-                    String file_save_path_InServer="J:\\";
+                    String file_save_path_InServer="/data/wwwroot/IFace/student";
                     StudengUPhoto(file_save_path_InServer);
                 }
                 break;
@@ -299,6 +302,13 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                                         @Override
                                         public void run() {
                                             Toast.makeText( PhotoActivity.this,"上传成功",Toast.LENGTH_SHORT ).show();
+
+                                          /*  String url = "http://47.115.6.199/data/wwwroot/IFace/IFace_res/1.jpg";
+                                            String updateTime = String.valueOf(System.currentTimeMillis());
+                                            Glide.with(PhotoActivity.this).load(url)
+                                                    .signature(new StringSignature(updateTime))
+                                                    .into(Pic);*/
+
                                         }
                                     });
                                 }else{
@@ -362,7 +372,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
                 System.out.printf( "111111111111111111" );
                 Request request = new Request.Builder()
-                        .url(server+"savePictures/")
+                        .url(server+"postIfaceCheck/")
                         .post(requestBody)
                         .build();
                 Call call = client.newCall(request);

@@ -56,6 +56,8 @@ public class AdapterKaoqin extends RecyclerView.Adapter<AdapterKaoqin.ViewHolder
         TextView qiandaoTime;
         TextView qiandaoNumber;
         TextView checkNumber;
+        TextView postType;
+
 
         public ViewHolder(@NonNull View view) {
             super( view );
@@ -63,6 +65,7 @@ public class AdapterKaoqin extends RecyclerView.Adapter<AdapterKaoqin.ViewHolder
             qiandaoTime = view.findViewById( R.id. qiandaoTime );
             qiandaoNumber = view.findViewById(R.id.qiandaoNumber );
             checkNumber = view.findViewById(R.id.checkNumber);
+            postType = view.findViewById(R.id.qiandaoType);
         }
     }
 
@@ -81,7 +84,7 @@ public class AdapterKaoqin extends RecyclerView.Adapter<AdapterKaoqin.ViewHolder
         holder.qiandaoTime.setText( "时间:"+kaoqinPoint.getTime());
         holder.qiandaoNumber.setText( kaoqinPoint.getQiandaoNumber() );//签到总人数
         holder.checkNumber.setText("第" +kaoqinPoint.getCheckNumber()+"次签到");
-
+        holder.postType.setText(kaoqinPoint.getPostType());
         if (onitemClick != null) {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

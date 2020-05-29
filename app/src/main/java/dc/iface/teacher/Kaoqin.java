@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -72,7 +73,7 @@ public class Kaoqin extends BaseActivity {
         setContentView( R.layout.kaoqin);
 
         recyclerView = findViewById(R.id.kaoqin_list);
-
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         Intent mainToKQ = getIntent();
         courseCode = mainToKQ.getStringExtra("courseId");//课程码匹配
         teacherId=mainToKQ.getStringExtra("teacherId");
@@ -87,10 +88,10 @@ public class Kaoqin extends BaseActivity {
         back.setOnClickListener(new View.OnClickListener() {//返回按钮
             @Override
             public void onClick(View view) {
-                ActivityCollectorUtil.finishActivity( MainActivity.class);
+               /* ActivityCollectorUtil.finishActivity( MainActivity.class);
                 Intent intent=new Intent(Kaoqin.this,MainActivity.class);
                 startActivity(intent);
-                ActivityCollectorUtil.finishActivity(Kaoqin.class);
+                ActivityCollectorUtil.finishActivity(Kaoqin.class);*/
                 finish();
             }
         });
@@ -107,6 +108,7 @@ public class Kaoqin extends BaseActivity {
                 intent2.putExtra("flag","1");
 
                 startActivity(intent2);
+
             }
         });
 
@@ -186,7 +188,7 @@ public class Kaoqin extends BaseActivity {
                         if(response.isSuccessful()){
                             final String result = response.body().string();
                             parseJSONWithJSONObjectArray(result);
-                            Log.d( "StuMainFragmentClass", result );
+                            Log.d( "StuMainFragmentClass", "http返回："+result );
                         }
                     }
                 });
@@ -207,6 +209,14 @@ public class Kaoqin extends BaseActivity {
                 String post_num =jsonObject.getString( "post_num" );
                 String post_date =jsonObject.getString( "post_date" );
                 String post_id =jsonObject.getString( "post_id" );
+                int post_type =jsonObject.getInt( "post_type" );
+
+
+                if(post_type==1){
+                    item.setPostType( "人脸识别" );//签到方式
+                }else{
+                    item.setPostType( "数字签到" );//签到方式
+                }
 
                 item.setPostId( post_id);
                 item.setCheckNumber(post_num);

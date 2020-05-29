@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -70,6 +71,7 @@ public class KaoqinActivity extends BaseActivity {
         setContentView( R.layout.stukaoqin);
 
         recyclerView = findViewById(R.id.stukaoqin_list);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         kaoqinBtn = findViewById(R.id.stufabuqiandaoBtn);
 
         kaoqinBtn.setText("签到");
@@ -85,12 +87,11 @@ public class KaoqinActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 //点击返回键后，从新打开新的StuMainActivity活动，之前的StuMainActivity活动需要关闭
-                ActivityCollectorUtil.finishActivity(StuMainActivity.class);
-
+               /* ActivityCollectorUtil.finishActivity(StuMainActivity.class);
                 Intent intent=new Intent(KaoqinActivity.this, StuMainActivity.class);
                 intent.putExtra("courseId",courseCode);
                 startActivity(intent);
-                ActivityCollectorUtil.finishActivity(KaoqinActivity.class);
+                ActivityCollectorUtil.finishActivity(KaoqinActivity.class);*/
                 finish();
             }
         });
@@ -104,39 +105,14 @@ public class KaoqinActivity extends BaseActivity {
                 intent2.putExtra("courseId",courseCode);
                 intent2.putExtra("studentId",studentId);
                 startActivity(intent2);
+
             }
         });
 
         LodeListView();
     }
 
-   /* public boolean IsAttendanceS(String postId,String studentid){
-        boolean flag=true;//出勤
 
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select sign_id from  sign_in where student_id ="+studentid+" and post_id ="+postId;
-        System.out.printf( sql );
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-            if(resultSet.next()) {
-                //查询结果不为空，则出勤
-                System.out.println( resultSet.getString("sign_id") );
-                flag=true;
-                resultSet.getStatement().getConnection().close();
-            }else{
-                //查询结果为空，表明没有出勤
-                System.out.println("学生id= "+studentid+" 未签到" );
-                flag=false;
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.printf( e.getMessage() );
-        }
-
-        return  flag;
-    }*/
 
     public void LodeListView(){
         /**
@@ -173,7 +149,7 @@ public class KaoqinActivity extends BaseActivity {
                         if(response.isSuccessful()){
                             final String result = response.body().string();
                             parseJSONWithJSONObjectArray(result);
-                            Log.d( "KaoqinActivity", result );
+                            Log.d( "KaoqinActivity","http返回："+ result );
                         }
                     }
                 });
@@ -193,6 +169,8 @@ public class KaoqinActivity extends BaseActivity {
                 String Check=jsonObject.getString( "IsCheck" );
                 String post_num =jsonObject.getString( "post_num" );
                 String post_date =jsonObject.getString( "post_date" );
+                int post_type =jsonObject.getInt( "post_type" );
+
                 Log.d( "KaoqinActivity","post_num is "+post_num );
                 Log.d( "KaoqinActivity","post_date is "+post_date );
                 Log.d( "KaoqinActivity","IsCheck is "+Check );
@@ -200,7 +178,13 @@ public class KaoqinActivity extends BaseActivity {
                 item.setCheckNumber(post_num );
                 //item.setPostId( resultSet.getString("post_id") );
                 item.setTime(post_date);
-                item.setQiandaoNumber("出勤");//其实这是出勤状况 默认出勤
+                item.setQiandaoNumber(Check);//其实这是出勤状况 默认出勤
+                if(post_type==1){
+                    item.setPostType( "人脸识别" );//签到方式
+                }else{
+                    item.setPostType( "数字签到" );//签到方式
+                }
+
                 listItemKaoqin.add(item);
 
             }
@@ -220,7 +204,7 @@ public class KaoqinActivity extends BaseActivity {
             public void run() {
                 for (int i = 0; i < listItemKaoqin.size(); i++) {
                     ListItemKaoqin s = (ListItemKaoqin)listItemKaoqin.get(i);
-                    System.out.println(i+"输1出："+s.getCheckNumber()+"  "+s.getPostId()+"  "+s.getQiandaoNumber()+"\n");
+                    System.out.println(i+"输1出："+s.getCheckNumber()+"  "+s.getPostType()+"  "+s.getQiandaoNumber()+"\n");
                 }
 
                 LinearLayoutManager linearLayoutManager = new LinearLayoutManager(KaoqinActivity.this  );
@@ -239,7 +223,33 @@ public class KaoqinActivity extends BaseActivity {
     }
 }
 
+ /* public boolean IsAttendanceS(String postId,String studentid){
+        boolean flag=true;//出勤
 
+        DBUtils dbUtils= new DBUtils();
+        String sql = "select sign_id from  sign_in where student_id ="+studentid+" and post_id ="+postId;
+        System.out.printf( sql );
+        ResultSet resultSet = dbUtils.excuteSQL( sql );
+
+        try{
+            if(resultSet.next()) {
+                //查询结果不为空，则出勤
+                System.out.println( resultSet.getString("sign_id") );
+                flag=true;
+                resultSet.getStatement().getConnection().close();
+            }else{
+                //查询结果为空，表明没有出勤
+                System.out.println("学生id= "+studentid+" 未签到" );
+                flag=false;
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.printf( e.getMessage() );
+        }
+
+        return  flag;
+    }*/
 /*new Thread( new Runnable() {
 @Override
 public void run() {

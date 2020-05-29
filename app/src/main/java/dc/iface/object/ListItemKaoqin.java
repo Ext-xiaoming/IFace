@@ -4,8 +4,7 @@ public class ListItemKaoqin {
     private String time;
     private String qiandaoNumber;//签到的人数
     private String checkNumber;//第几次签到
-    private String postId;
-
+    private String postType;
 
     public String getPostId() {
         return postId;
@@ -13,6 +12,16 @@ public class ListItemKaoqin {
 
     public void setPostId(String postId) {
         this.postId = postId;
+    }
+
+    private String postId;
+
+    public String getPostType() {
+        return postType;
+    }
+
+    public void setPostType(String postType) {
+        this.postType = postType;
     }
 
     public String getCheckNumber() {
@@ -38,4 +47,6 @@ public class ListItemKaoqin {
     public void setQiandaoNumber(String qiandaoNumber) {
         this.qiandaoNumber = qiandaoNumber;
     }
+
+
 }

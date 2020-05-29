@@ -82,9 +82,9 @@ public class CoursesAdapter extends RecyclerView.Adapter<CoursesAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         CourseListItem coursePoint = CoursesData.get(position);
-        holder.className.setText( "课程名:" +coursePoint.getCourseName());
+        holder.className.setText( "课程:" +coursePoint.getCourseName());
         holder.classCode.setText( "加课码:" + coursePoint.getCourseId());
-        holder.teacherNameItem.setText( "老师名:" +coursePoint.getTeacherName() );
+        holder.teacherNameItem.setText( "教师:" +coursePoint.getTeacherName() );
         if (onitemClick != null) {
             holder.view.setOnClickListener(new View.OnClickListener() {
                 @Override

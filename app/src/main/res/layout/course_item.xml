@@ -5,60 +5,79 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:padding="8dp"
-    android:orientation="horizontal">
+    android:orientation="vertical">
     <!-- 原本应该用CardView可插入图片     app:cardCornerRadius="8dp"             android:text="135"-->
-
     <LinearLayout
-        android:layout_width="190dp"
-        android:layout_height="90dp"
-        android:orientation="vertical">
-        <TextView
-            android:gravity="left|center_vertical"
-            android:id="@+id/className"
-            android:layout_width="match_parent"
-            android:layout_height="45dp"
-            android:textColor="@color/colorPrimary"
-            android:textSize="22dp"
-            android:text="课程名称"
-            android:textStyle="bold" /><!--style="@style/TextAppearance.AppCompat.AppCompat.Subhead"-->
-        <TextView
-            android:id="@+id/classCode"
-            android:layout_width="match_parent"
-            android:layout_height="43dp"
-            android:gravity="left|center_vertical"
-            android:paddingStart="8dp"
-            android:paddingBottom="4dp"
-            android:text="加课码"
-            android:textColor="@android:color/secondary_text_light"
-            android:textSize="16dp" />
-    </LinearLayout>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+        <LinearLayout
+            android:layout_width="190dp"
+            android:layout_height="90dp"
+            android:orientation="vertical">
+            <TextView
+                android:gravity="left|center_vertical"
+                android:id="@+id/className"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:textColor="@color/colorPrimary"
+                android:textSize="22dp"
+                android:text="课程名称"
+                android:textStyle="bold" /><!--style="@style/TextAppearance.AppCompat.AppCompat.Subhead"-->
+            <TextView
+                android:id="@+id/classCode"
+                android:layout_width="match_parent"
+                android:layout_height="43dp"
+                android:gravity="left|center_vertical"
+                android:paddingStart="8dp"
+                android:paddingBottom="4dp"
+                android:text="加课码"
+                android:textColor="@android:color/secondary_text_light"
+                android:textSize="16dp" />
+        </LinearLayout>
 
-    <LinearLayout
-        android:gravity="center"
-        android:layout_width="210dp"
-        android:layout_height="90dp"
-        android:orientation="vertical"
+        <LinearLayout
+            android:gravity="center"
+            android:layout_width="210dp"
+            android:layout_height="90dp"
+            android:orientation="vertical"
 
-        >
+            >
+            <TextView
+                android:layout_marginTop="43dp"
+                android:textSize="16dp"
+                android:gravity="left|center_vertical"
+                android:text="XXX"
+                android:id="@+id/teacherNameItem"
+                android:layout_width = "match_parent"
+                android:layout_height = "43dp"
+                android:textColor="@android:color/secondary_text_light"
+                />
+
+        </LinearLayout>
+
+        <!--如果加入人数的话
         <TextView
-            android:layout_marginTop="43dp"
-            android:textSize="16dp"
-            android:gravity="center_horizontal"
-            android:text="老师：XXX"
-            android:id="@+id/teacherNameItem"
+            android:paddingTop="10dp"
+            android:id="@+id/TotalNumber"
             android:layout_width = "match_parent"
-            android:layout_height = "43dp"
-            android:textColor="@android:color/secondary_text_light"
-            />
-
+            android:layout_height = "wrap_content"
+            android:textColor="@android:color/secondary_text_light" />
+            -->
     </LinearLayout>
-    <!--如果加入人数的话
-    <TextView
-        android:paddingTop="10dp"
-        android:id="@+id/TotalNumber"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:textColor="@android:color/secondary_text_light" />
-        -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_above="@+id/main_radio"
+            android:layout_marginBottom="3dp"
+            android:background="@color/colorPrimaryDark"/>
+    </LinearLayout>
+
 </LinearLayout>
 

@@ -119,6 +119,8 @@ public class FaqianActivity extends BaseActivity {
         back.setOnClickListener(new View.OnClickListener() {//返回按钮
             @Override
             public void onClick(View view) {
+//                Intent intent2 = new Intent(FaqianActivity.this, Kaoqin.class);
+//                startActivity(intent2);
                 finish();
             }
         });
@@ -278,7 +280,7 @@ public class FaqianActivity extends BaseActivity {
                 {
                     for(int result :grantResults){
                         if(result!=PackageManager.PERMISSION_GRANTED){
-                            Toast.makeText( this,"必须同意权限",Toast.LENGTH_LONG ).show();
+                            //Toast.makeText( this,"必须同意权限",Toast.LENGTH_LONG ).show();
                         }
                     }
                     requestLocation();

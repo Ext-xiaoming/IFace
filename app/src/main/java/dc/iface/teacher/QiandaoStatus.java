@@ -11,6 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -69,7 +70,7 @@ public class QiandaoStatus extends BaseActivity {
         postId=KQToStatus.getStringExtra("postId");
 
         recyclerView = findViewById(R.id.statusItem);
-
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         biaoti = findViewById(R.id.title_sec);
         biaoti.setText("第"+checkNum+"次签到");
 

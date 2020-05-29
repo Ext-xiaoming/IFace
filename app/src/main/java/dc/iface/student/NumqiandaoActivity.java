@@ -331,6 +331,9 @@ public class NumqiandaoActivity extends BaseActivity  implements View.OnClickLis
                 public void run() {
                     if(res!=-1){
                         Toast.makeText(NumqiandaoActivity.this, "签到成功" , Toast.LENGTH_LONG).show();
+
+                        finish();//这里先关闭活动 等数字签到成功后自动返
+
                     }else{
                         Toast.makeText(NumqiandaoActivity.this, "签到信息存入失败" , Toast.LENGTH_LONG).show();
                     }
@@ -351,7 +354,7 @@ public class NumqiandaoActivity extends BaseActivity  implements View.OnClickLis
                 {
                     for(int result :grantResults){
                         if(result!=PackageManager.PERMISSION_GRANTED){
-                            Toast.makeText( this,"必须同意权限",Toast.LENGTH_LONG ).show();
+                            //Toast.makeText( this,"必须同意权限",Toast.LENGTH_LONG ).show();
                             //finish();
                             //return;
                         }
