@@ -111,7 +111,7 @@ public class QiandaoStatus extends BaseActivity {
             ser_res_pic.setBackgroundColor( Color.rgb( 240, 248, 255 ) );
 
             //String url = "http://47.115.6.199/statics/images/"+courseCode+"_"+checkNum+".jpg";
-            String url = "http://192.168.43.69:8000/statics/images/" + courseCode + "_" + checkNum + ".jpg";
+            String url =server+ "statics/images/" + courseCode + "_" + checkNum + ".jpg";
 
             //String url = "http://47.115.6.199/statics/images/2030_7.jpg";
             String updateTime = String.valueOf( System.currentTimeMillis() );

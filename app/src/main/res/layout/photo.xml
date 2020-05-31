@@ -1,28 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:id="@+id/TakePhoto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="拍照"/>
+        android:layout_height="66dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="拍照"
+        app:icon="@drawable/round_photo_camera_black_18dp"
+        app:cornerRadius="20dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:id="@+id/SelectPhoto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="从图库中选取"/>
+        android:layout_height="66dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="从图库中选取"
+        app:icon="@drawable/round_photo_library_black_18dp"
+        app:cornerRadius="20dp"/>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
+        style="@style/Widget.MaterialComponents.Button.Icon"
         android:id="@+id/UploadPhoto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="上传"/>
+        android:layout_height="66dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"
+        android:text="上传"
+        app:icon="@drawable/round_cloud_upload_black_18dp"
+        app:cornerRadius="20dp"/>
+
 
     <TextView
         android:id="@+id/TPath"
@@ -42,13 +60,13 @@
         android:layout_height="wrap_content"
         />
 
-
     <ImageView
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_gravity="center"
         android:id="@+id/Pic"
         android:layout_width="350dp"
-        android:layout_height="350dp"
+        android:layout_height="match_parent"
         android:scaleType="centerInside"
         />
 

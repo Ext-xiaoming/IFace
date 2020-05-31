@@ -2,8 +2,8 @@
 <!--注册界面-->
 <!--这里的布局放置是： 1 个 ImageView 控件，用于显示用户头像；3 个 EditText 控件，用于输入用户名、密码、再次输入密码；1 个 Button 控件为注册按钮-->
 <!--修改 activity_register.xml 为 LinearLayout 布局-->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_register"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -50,23 +50,33 @@
             android:layout_marginBottom="6dp"
             android:layout_alignParentBottom="true"/>
 
-        <EditText
-            android:id="@+id/et_user_id"
-            android:layout_width="fill_parent"
-            android:layout_height="48dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginLeft="48dp"
-            android:layout_marginRight="48dp"
-            android:drawablePadding="10dp"
-            android:gravity="center_vertical"
-            android:hint="请自定义数字账号"
-            android:paddingLeft="8dp"
-            android:singleLine="true"
-            android:textColor="#000000"
-            android:textColorHint="#a3a3a3"
-            android:textSize="14sp"
-            android:layout_marginBottom="6dp"
-            android:layout_alignParentBottom="true"/>
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+
+        </com.google.android.material.textfield.TextInputEditText>
+
+
+            <EditText
+                android:id="@+id/et_user_id"
+                android:layout_width="fill_parent"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="48dp"
+                android:layout_marginRight="48dp"
+                android:drawablePadding="10dp"
+                android:gravity="center_vertical"
+                android:hint="请自定义数字账号"
+                android:paddingLeft="8dp"
+                android:singleLine="true"
+                android:textColor="#000000"
+                android:textColorHint="#a3a3a3"
+                android:textSize="14sp"
+                android:layout_marginBottom="6dp"
+                android:layout_alignParentBottom="true"/>
+
+
     </RelativeLayout>
 
 
@@ -180,28 +190,13 @@
 
 
     </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="16dp"
         android:layout_marginStart="48dp"
         android:layout_marginEnd="48dp">
-
-        <!--<Spinner-->
-        <!--android:id="@+id/et_user_nam"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="48dp"-->
-        <!--android:layout_gravity="center_horizontal"-->
-        <!--android:layout_marginLeft="35dp"-->
-        <!--android:layout_marginRight="35dp"-->
-        <!--android:drawablePadding="10dp"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:hint="请输入用户名"-->
-        <!--android:paddingLeft="8dp"-->
-        <!--android:singleLine="true"-->
-        <!--android:textColor="#000000"-->
-        <!--android:textColorHint="#a3a3a3"-->
-        <!--android:textSize="14sp"/>-->
 
         <RadioGroup
             android:layout_width="match_parent"
@@ -212,7 +207,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal"
             >
-
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -234,33 +228,53 @@
         </RadioGroup>
     </RelativeLayout>
 
+
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginTop="16dp"
+        android:layout_margin="48dp"
         android:orientation="horizontal"
     >
-        <Button
-            android:id="@+id/btn_fanhui"
-            android:layout_width="160dp"
-            android:layout_marginLeft="40dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:text="返 回"
-            android:background="@color/colorPrimary"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"/>
-        <Button
-            android:id="@+id/btn_register"
-            android:layout_width="160dp"
-            android:layout_marginLeft="16dp"
-            android:layout_height="60dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:text="注 册"
-            android:background="@color/colorPrimary"
-            android:textColor="@android:color/white"
-            android:textSize="18sp"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:id="@+id/btn_fanhui"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="返 回"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:elevation="5dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginLeft="5dp"
+                />
+
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:id="@+id/btn_register"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:text="注 册"
+                android:background="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:elevation="5dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginRight="5dp"
+                />
+
+        </RelativeLayout>
     </LinearLayout>
+
+
+
 </LinearLayout>

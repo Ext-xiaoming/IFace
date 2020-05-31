@@ -16,6 +16,8 @@ import static dc.iface.login.LoginActivity.autoLogin;
 import static dc.iface.login.LoginActivity.isRemember;
 import static dc.iface.login.LoginActivity.pref;
 
+
+//待补充
 public class LogoActivity extends BaseActivity {
 
     @Override

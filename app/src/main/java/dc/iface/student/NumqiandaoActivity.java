@@ -291,7 +291,7 @@ public class NumqiandaoActivity extends BaseActivity  implements View.OnClickLis
                         .build();
 
                 final Request request = new Request.Builder()
-                        .url("http://10.34.15.176:8000/numQiandaoS/")
+                        .url(server+"numQiandaoS/")
                         .post(body)
                         .build();
                 Call call = client.newCall(request);

@@ -73,8 +73,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
 
-        ImageView_pwd_switch = findViewById( R.id.ImageView_pwd_switch);
-        ImageView_pwd_switch.setOnClickListener(this);
+
         editTextName = findViewById(R.id.EditText_JobNumber);
         editTextPwd = findViewById(R.id.EditText_Password);
         loginBtn = findViewById(R.id.denglu);
@@ -141,9 +140,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
             case R.id.TextView_forget_pwd:
                 forgetpwd();
                 break;
-            case R.id.ImageView_pwd_switch:
+           /* case R.id.ImageView_pwd_switch:
                 //设置密码可见于不可见
-                Password_is_visible();
+                Password_is_visible();*/
             default:
                 break;
         }

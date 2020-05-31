@@ -56,31 +56,43 @@
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:orientation="vertical">
-        <TextView
+
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:id="@+id/stushangchuanzp_text"
             android:layout_marginTop="10dp"
-            android:layout_width="160dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="26dp"
             android:text="上传照片"
-            android:textColor="@color/colorPrimary"/>
-        <TextView
+            android:elevation="5dp"
+
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:id="@+id/stuxiugai_text"
             android:layout_marginTop="20dp"
-            android:layout_width="160dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="26dp"
             android:text="修改密码"
-            android:textColor="@color/colorPrimary"/>
-        <TextView
+            android:elevation="5dp"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:id="@+id/stuzhuxiao_text"
             android:layout_marginTop="20dp"
-            android:layout_width="160dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="26dp"
             android:text="注销登录"
+            android:elevation="5dp"
 
-            android:textColor="@color/colorPrimary"/>
+            />
+
     </LinearLayout>
 
        

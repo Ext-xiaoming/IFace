@@ -77,9 +77,6 @@ public class KaoqinActivity extends BaseActivity {
         swipeRefreshLayout.setColorSchemeResources(R.color.blue);
 
 
-
-
-
         recyclerView = findViewById(R.id.stukaoqin_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         kaoqinBtn = findViewById(R.id.stufabuqiandaoBtn);
@@ -96,12 +93,6 @@ public class KaoqinActivity extends BaseActivity {
         back.setOnClickListener(new View.OnClickListener() {//返回按钮
             @Override
             public void onClick(View view) {
-                //点击返回键后，从新打开新的StuMainActivity活动，之前的StuMainActivity活动需要关闭
-               /* ActivityCollectorUtil.finishActivity(StuMainActivity.class);
-                Intent intent=new Intent(KaoqinActivity.this, StuMainActivity.class);
-                intent.putExtra("courseId",courseCode);
-                startActivity(intent);
-                ActivityCollectorUtil.finishActivity(KaoqinActivity.class);*/
                 finish();
             }
         });
@@ -138,16 +129,14 @@ public class KaoqinActivity extends BaseActivity {
     }
 
     public void LodeListView(){
-        /**
-         * 传递 、
-         * 获取
-         * */
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();
                 FormBody body = new FormBody.Builder()
                         .add("courseId",courseCode)
+                        .add("studentId",studentId)
                         .build();
 
                 final Request request = new Request.Builder()

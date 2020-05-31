@@ -13,12 +13,19 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp">
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
             android:id="@+id/stufabuqiandaoBtn"
-            android:text="发布数字签到" />
+            android:text="发布数字签到"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="26dp"
+            android:elevation="5dp"
+
+            />
     </LinearLayout>
     <!--<LinearLayout
         android:layout_width="match_parent"

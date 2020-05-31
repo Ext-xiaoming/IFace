@@ -51,7 +51,7 @@ public class SignupActiviy extends BaseActivity {
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView( R.layout.sign_up);
+        setContentView( R.layout.sign_up_test);
 
         et_id=findViewById(R.id.et_user_id);
         et_user=findViewById(R.id.et_user_name);
@@ -65,6 +65,11 @@ public class SignupActiviy extends BaseActivity {
         group=findViewById(R.id.myRadioGroup);
         teacherRa=findViewById(R.id.check_teacher);
         studentRa=findViewById(R.id.check_student);
+
+
+
+
+
 
         group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
