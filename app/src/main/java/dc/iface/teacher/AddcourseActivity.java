@@ -58,11 +58,7 @@ public class AddcourseActivity extends BaseActivity {
         back=findViewById(R.id.btn_back);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                //Intent intent=new Intent(AddcourseActivity.this,MainActivity.class);
-                //startActivity(intent);
-                finish();
-            }
+            public void onClick(View view) { finish(); }
         });
 
 
@@ -146,6 +142,9 @@ public class AddcourseActivity extends BaseActivity {
             public void run() {
                 if(res==1){
                     Toast.makeText( AddcourseActivity.this, "发布课程成功！" , Toast.LENGTH_LONG).show();
+                    //发布课程成功后 返回主页面
+                    finish();
+
                 }else if(res==0){
                     Toast.makeText( AddcourseActivity.this, "课程码已经被注册！" , Toast.LENGTH_LONG).show();
                 }else{

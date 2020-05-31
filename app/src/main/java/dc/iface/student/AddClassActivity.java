@@ -138,6 +138,8 @@ public class AddClassActivity extends BaseActivity {
             public void run() {
                 if(res==1){
                     Toast.makeText( AddClassActivity.this, "加入课程成功！" , Toast.LENGTH_LONG).show();
+                    //加课完成直接结束页面
+                    finish();
                 }else if(res==0){
                     Toast.makeText( AddClassActivity.this, "课程已经加入！" , Toast.LENGTH_LONG).show();
                 }else{

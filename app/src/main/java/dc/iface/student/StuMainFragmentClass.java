@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,6 +41,8 @@ public class StuMainFragmentClass extends Fragment {
     private RecyclerView recyclerView;
     private CoursesAdapter coursesAdapter;
     private List<CourseListItem> listItemCourses;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
     public static StuMainFragmentClass getMainFragment(String studentId){
         if(mf == null){
             mf = new StuMainFragmentClass();
@@ -52,6 +55,12 @@ public class StuMainFragmentClass extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.i(TAG,"进入onCreateView :");
         final View view = inflater.inflate( R.layout.main_fragment_class ,container, false);//fragment_message为底部栏的界面
+
+
+        //下拉刷新
+        swipeRefreshLayout=view.findViewById( R.id.swipeRefreshlayout3);
+        swipeRefreshLayout.setColorSchemeResources(R.color.blue);
+
         recyclerView = view.findViewById(R.id.course_list);
         //添加Android自带的分割线
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
@@ -63,6 +72,21 @@ public class StuMainFragmentClass extends Fragment {
         //*************************************************************************************************************
         LodeListView();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //这里获取数据的逻辑
+                LodeListView();
+                Log.i(TAG , "1"+ "执行刷新" );
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
     }
 
 
@@ -173,29 +197,6 @@ public class StuMainFragmentClass extends Fragment {
     }
 }
 
-  /*  public String QueryTeacherName(String teacher_id){
 
-        String TeacherName="";
-
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select teacher_name from teacher where teacher_id ="+teacher_id;
-        System.out.printf( sql );
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-
-            if( resultSet.next()) {
-                TeacherName=resultSet.getString( "teacher_name" );
-                resultSet.getStatement().getConnection().close();
-            }
-            else{
-                //TeacherName=0;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.printf( e.getMessage() );
-        }
-        return TeacherName;
-    }*/
 
 

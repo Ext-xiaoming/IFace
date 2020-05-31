@@ -2,6 +2,7 @@ package dc.iface.student;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.tv.TvContract;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import org.json.JSONArray;
@@ -50,7 +52,7 @@ public class KaoqinActivity extends BaseActivity {
     private ImageButton back;
     private Button kaoqinBtn;
     private Button facebtn;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
     private TextView biaoti;
     ListView lvListView ;
     private String courseCode;//从主界面来的课程码
@@ -69,6 +71,14 @@ public class KaoqinActivity extends BaseActivity {
             getSupportActionBar().hide();
         }
         setContentView( R.layout.stukaoqin);
+
+        //下拉刷新
+        swipeRefreshLayout=findViewById( R.id.swipeRefreshlayout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.blue);
+
+
+
+
 
         recyclerView = findViewById(R.id.stukaoqin_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
@@ -108,11 +118,24 @@ public class KaoqinActivity extends BaseActivity {
 
             }
         });
-
         LodeListView();
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //这里获取数据的逻辑
+                LodeListView();
+                Log.i(TAG , "1"+ "执行刷新" );
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+    }
 
     public void LodeListView(){
         /**
@@ -222,94 +245,3 @@ public class KaoqinActivity extends BaseActivity {
         });
     }
 }
-
- /* public boolean IsAttendanceS(String postId,String studentid){
-        boolean flag=true;//出勤
-
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select sign_id from  sign_in where student_id ="+studentid+" and post_id ="+postId;
-        System.out.printf( sql );
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-            if(resultSet.next()) {
-                //查询结果不为空，则出勤
-                System.out.println( resultSet.getString("sign_id") );
-                flag=true;
-                resultSet.getStatement().getConnection().close();
-            }else{
-                //查询结果为空，表明没有出勤
-                System.out.println("学生id= "+studentid+" 未签到" );
-                flag=false;
-            }
-
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.printf( e.getMessage() );
-        }
-
-        return  flag;
-    }*/
-/*new Thread( new Runnable() {
-@Override
-public void run() {
-        //签到次序+ 时间+ 是否出勤
-
-        //首先将所有的发布的签到 拿到
-        DBUtils dbUtils= new DBUtils();
-
-        String sql = "select post_id,post_num , post_date from post_check_in  where course_id ="+courseCode
-        +" order by post_num desc ";
-        System.out.printf( sql );
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-        try{
-        while(resultSet.next()){
-
-        ListItemKaoqin item = new ListItemKaoqin();
-        item.setCheckNumber( resultSet.getString("post_num") );
-        System.out.printf(  "post_num= "+ resultSet.getString("post_num") );
-        item.setPostId( resultSet.getString("post_id") );
-        item.setTime(resultSet.getString("post_date"));
-        System.out.printf(  "post_date= "+resultSet.getString("post_date") );
-
-        if(IsAttendanceS(resultSet.getString("post_id") ,studentId))
-        {
-        item.setQiandaoNumber("出勤");//其实这是出勤状况 默认出勤
-        }else{
-        item.setQiandaoNumber("缺勤");
-        }
-
-        listItemKaoqin.add(item);
-        }
-
-        for (int i = 0; i < listItemKaoqin.size(); i++) {
-        ListItemKaoqin s = (ListItemKaoqin)listItemKaoqin.get(i);
-        System.out.println(i+"输1出："+s.getCheckNumber()+"  "+s.getPostId()+"  "+s.getQiandaoNumber()+"\n");
-        }
-
-
-        adapterKaoqin = new AdapterKaoqin(KaoqinActivity.this,
-        R.layout.item_kaoqian, listItemKaoqin);
-
-        runOnUiThread(new Runnable() {
-@Override
-public void run() {
-        System.out.println( "list.size="+listItemKaoqin.size()+"--00000000000000\n");
-        for (int i = 0; i < listItemKaoqin.size(); i++) {
-        ListItemKaoqin s = (ListItemKaoqin)listItemKaoqin.get(i);
-        System.out.println(i+"输出："+s.getCheckNumber()+"  "+s.getPostId()+"  "+s.getQiandaoNumber()+"\n");
-        }
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(KaoqinActivity.this  );
-        recyclerView.setLayoutManager( linearLayoutManager );
-        recyclerView.setAdapter(adapterKaoqin);
-        }
-        });
-
-
-        resultSet.getStatement().getConnection().close();
-        }catch (Exception e){
-        e.printStackTrace();
-        System.out.printf( e.getMessage() );
-        }
-        }
-        } ).start();*/

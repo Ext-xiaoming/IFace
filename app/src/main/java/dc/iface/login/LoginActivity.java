@@ -42,7 +42,6 @@ import okhttp3.Response;
 
 import static dc.iface.Server.URI.server;
 
-
 public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     private TextView signUp;
@@ -53,7 +52,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     private TextView TextView_forget_pwd;
     //使用SharedPreferences实现记住密码
     //******************************************************
-    private SharedPreferences pref;
+    public  static SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private CheckBox rememberPass;//记住密码选项框
     //******************************************************
@@ -65,6 +64,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     private String password;
     private int flag=-1;
+
+    public static  boolean isRemember;
+    public static  boolean autoLogin;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +91,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         editor =pref.edit();//获取SharedPreferences.Editor对象，编辑操作的对象
 
         //抽取SharedPreferences文件中的数据，判断是否勾选记住密码
-        boolean isRemember = pref.getBoolean("rememberPassword", false);
-        boolean autoLogin = pref.getBoolean("autologin", false);
+        isRemember = pref.getBoolean("rememberPassword", false);
+        autoLogin = pref.getBoolean("autologin", false);
 
         //**********************************************************
         StatisClass statisClass = new StatisClass();
@@ -105,6 +108,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
         if (isRemember) {
             //如果勾选记住密码，将账号密码添加到文本框
+            loginBtn.setEnabled(false);
             String account = pref.getString("account", "");
             String password = pref.getString("password", "");
             editTextName.setText(account);
@@ -119,6 +123,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 toLogin(cv);
                 Toast.makeText( LoginActivity.this,"自动登录成功！", Toast.LENGTH_SHORT).show();
             }
+        }else{
+            loginBtn.setEnabled(true);
         }
 
     }
@@ -241,8 +247,15 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                         editor.putBoolean("rememberPassword",true);
                         editor.putString("account",jobNum);
                         editor.putString("password",password);
+                        editor.putString("userName",userName);
                         editor.putBoolean("autologin",true);
-                        System.out.printf( "//记住密码T  " );
+                        if(res==1){
+                            editor.putString("flag","1");
+                        }
+                        if(res==0){
+                            editor.putString("flag","0");
+                        }
+
                     }
                     else{
                         editor.clear();

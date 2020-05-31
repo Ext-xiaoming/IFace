@@ -6,14 +6,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,15 +37,21 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import dc.iface.BaseActivity.ActivityCollectorUtil;
 import dc.iface.R;
+import dc.iface.student.ChangePswActivity;
 import dc.iface.student.NumqiandaoActivity;
+import dc.iface.student.StuMainFragmentUser;
+import dc.iface.teacher.Kaoqin;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -49,9 +60,15 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okio.Buffer;
+import okio.BufferedSink;
+import okio.Okio;
+import okio.Source;
 
+import static android.os.Environment.getExternalStoragePublicDirectory;
 import static dc.iface.Server.URI.server;
 import static dc.iface.teacher.FaqianActivity.getSmallLetter;
+import static mapsdkvi.com.gdi.bgl.android.java.EnvDrawText.bmp;
 
 public class PhotoActivity extends AppCompatActivity implements View.OnClickListener{
     private static final int REQUEST_CODE_CAMERA=1001;
@@ -60,12 +77,16 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     private static final int REQUEST_CODE_PHOTOSHOP=1002;
     private static final int REQUEST_PHOTOSHOP=2002;
 
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE" };
 
     private Button TakePhoto;
     private Button SelectPhoto;
     private Button UploadPhoto;
     private TextView Path;
-    private TextView Uri;
+    private TextView viewUri;
     //private LQRPhotoSelectUtils mLqrPhotoSelectUtils;
     private ImageView Pic;
     private Context context = PhotoActivity.this;
@@ -75,7 +96,16 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
     private String studentId;
     private String teacherId;
     int flag=1;//1 教师
-
+    private File f;
+    private String currentPhotoPath;
+    private Uri photoURI;
+    private String filename;
+    private int num;
+    private String courseName;
+    private String teacherName;
+    private String  courseId;
+    private TextView s_res_num;
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,14 +114,20 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         SelectPhoto = findViewById(R.id.SelectPhoto);
         UploadPhoto= findViewById(R.id.UploadPhoto);
         Path =  findViewById(R.id.TPath);
-        Uri = findViewById(R.id.TUri);
+        viewUri = findViewById(R.id.TUri);
         Pic =  findViewById(R.id.Pic);
+        s_res_num =  findViewById(R.id.num);
         TakePhoto.setOnClickListener( this );
         SelectPhoto.setOnClickListener( this);
         UploadPhoto.setOnClickListener( this );
+        UploadPhoto.setEnabled(false);
 
+        progressBar=findViewById( R.id.prograss_bar );
+        progressBar.setVisibility( View.INVISIBLE );
         Intent intent = getIntent();
         flag = Integer.parseInt(intent.getStringExtra("flag") );
+        courseName=intent.getStringExtra("courseName");
+        teacherName=intent.getStringExtra("teacherName");
 
     }
 
@@ -102,7 +138,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 if(ContextCompat.checkSelfPermission( PhotoActivity.this, Manifest.permission.CAMERA )!=
                         PackageManager.PERMISSION_GRANTED){
                     ActivityCompat.requestPermissions( PhotoActivity.this,
-                            new String[]{Manifest.permission.CAMERA},REQUEST_CAMERA );
+                            new String[]{
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                                    Manifest.permission.CAMERA},REQUEST_CAMERA );
                 }else{
                     TPhoto();
                 }
@@ -122,15 +161,17 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                 break;
 
             case R.id.UploadPhoto:
-                if(flag==1)//教师
-                {
-                    TeacherUPhoto();
-                }else{
-                    Intent intent = getIntent();
-                    studentId = intent.getStringExtra("studentId");
-                    String file_save_path_InServer="/data/wwwroot/IFace/student";
-                    StudengUPhoto(file_save_path_InServer);
-                }
+
+                    if(flag==1)//教师
+                    {
+                        TeacherUPhoto();
+                    }else{
+                        Intent intent = getIntent();
+                        studentId = intent.getStringExtra("studentId");
+                        String file_save_path_InServer="/data/wwwroot/IFace/student";
+                        StudengUPhoto(file_save_path_InServer);
+                    }
+
                 break;
             default:
                 break;
@@ -146,22 +187,117 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         return buffer.toString();
     }
 
+    //权限
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult( requestCode, permissions, grantResults );
+        switch (requestCode){
+            case REQUEST_CAMERA :
+                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    TPhoto();
+                }else{
+                    Toast.makeText( this,"你拒绝了权限",Toast.LENGTH_SHORT ).show();
+                }
+                break;
+
+            case REQUEST_PHOTOSHOP:
+                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                    SPhotos();
+                }else{
+                    Toast.makeText( this,"你拒绝了权限",Toast.LENGTH_SHORT ).show();
+                }
+                break;
+            default:
+        }
+
+    }
+
+    private void TPhoto() {
+
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+        }
+        // Continue only if the File was successfully created
+        if (photoFile != null) {
+            photoURI = FileProvider.getUriForFile(this,
+                    "dc.iface.fileprovider",
+                    photoFile);
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(intent, REQUEST_CODE_CAMERA);
+        }
+    }
+
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private File createImageFile2() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+    private void SPhotos() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");//相片类型
+        startActivityForResult(intent, REQUEST_CODE_PHOTOSHOP);
+    }
+
     //回调
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_CODE_CAMERA && resultCode == RESULT_OK) {
+
             Bitmap bm = null;
+
             try {
-                bm = getBitmapFormUri(mUri);
+                bm = getBitmapFormUri(photoURI);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                Log.d( "PhotoActivity","wqq3r4" +e.getMessage() );
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d( "PhotoActivity","324" +e.getMessage() );
+            }
+            System.out.printf( bm.toString() );
+            if(bm!=null)
+                Pic.setImageBitmap(bm);
+
+            UploadPhoto.setEnabled(true);
+            imagePath=currentPhotoPath;
+            System.out.printf( "成功" );
+
+            try {
+                galleryAddPic();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Pic.setImageBitmap(bm);
-            System.out.printf( "成功" );
+
             //加载到页面上
         }
         else if(requestCode == REQUEST_CODE_PHOTOSHOP && resultCode == RESULT_OK) {
@@ -180,6 +316,10 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                     e.printStackTrace();
                 }
                 Pic.setImageBitmap(bm);
+                UploadPhoto.setEnabled(true);
+                UriPathUtils uriPathUtils = new UriPathUtils();
+                imagePath= uriPathUtils.getRealPathFromUri(context,mUri);
+
             }
             System.out.printf( "成功！" );
         }else {
@@ -187,93 +327,44 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-
-    //权限
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult( requestCode, permissions, grantResults );
-        switch (requestCode){
-            case REQUEST_CAMERA :
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                    TPhoto();
-                }else{
-                    Toast.makeText( this,"你拒绝了权限",Toast.LENGTH_SHORT ).show();
-                }
-            break;
-
-            case REQUEST_PHOTOSHOP:
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                    SPhotos();
-                }else{
-                    Toast.makeText( this,"你拒绝了权限",Toast.LENGTH_SHORT ).show();
-                }
-                break;
-            default:
-        }
-
-    }
-
-    private void TPhoto() {
-        // 步骤一：创建存储照片的文件
-        String path = getFilesDir() + File.separator + "images" + File.separator;
-        File file = new File(path, "test.jpg");
-        if(!file.getParentFile().exists())
-            file.getParentFile().mkdirs();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            //步骤二：Android 7.0及以上获取文件 Uri
-            //com.rk.myfeaturesapp是自己App的包名fileprovider是死值
-            mUri = FileProvider.getUriForFile( PhotoActivity.this, "com.rk.myfeaturesapp.fileprovider", file);
-        } else {
-            //步骤三：获取文件Uri
-            mUri = android.net.Uri.fromFile(file);
-        }
-        //步骤四：调取系统拍照
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
-        startActivityForResult(intent,REQUEST_CODE_CAMERA);
-    }
-
-    private void SPhotos() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");//相片类型
-        startActivityForResult(intent, REQUEST_CODE_PHOTOSHOP);
+    private void galleryAddPic() throws IOException {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        f = new File(currentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
     //单纯上传照片用
     private  void StudengUPhoto(final String file_save_path_InServer ){
-        /**
-         * 需求:
-         * 1、指定图片在服务器的保存地址 pic_server_path
-         * 2、图片的类型（学生个人 or 班级照片）pic_tors
-         * 3、图片命名规范--单独指定字段 pic_name
-         */
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();
-                UriPathUtils uriPathUtils = new UriPathUtils();
-                imagePath= uriPathUtils.getRealPathFromUri(context,mUri);
 
+                String fileName = null;
                 File file = null;
 
                 try {
                     file  = new File( imagePath );
-                    Log.d( "PhotoActivity", file.getName().toString() );
+                    Log.d( "PhotoActivity", "4234244"+file.getAbsolutePath() );
+                    Log.d( "PhotoActivity", "4444"+file.getName().toString() );
                 }catch (Exception e){
                     Log.d( "PhotoActivity","111" +e.getMessage() );
                 }
 
-
                 RequestBody image = RequestBody.create( MediaType.parse("image/jpg"), file);
+
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType( MultipartBody.FORM)
                         .addFormDataPart("file", file.getName(), image)
                         .addFormDataPart( "studentId",studentId )
                         .addFormDataPart( "file_name_InSFolder","1.jpg" )
                         .addFormDataPart( "file_save_path_InServer",file_save_path_InServer )
-                        //.addFormDataPart( "file_name_InSFolder",file_name_InSFolder )
                         .build();
+
+
                 Log.d( "PhotoActivity", "111111111111111111" );
 
                 Request request = new Request.Builder()
@@ -281,6 +372,14 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                         .post(requestBody)
                         .build();
                 Call call = client.newCall(request);
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility( View.VISIBLE );
+                    }
+                });
+
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
@@ -302,13 +401,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                                         @Override
                                         public void run() {
                                             Toast.makeText( PhotoActivity.this,"上传成功",Toast.LENGTH_SHORT ).show();
-
-                                          /*  String url = "http://47.115.6.199/data/wwwroot/IFace/IFace_res/1.jpg";
-                                            String updateTime = String.valueOf(System.currentTimeMillis());
-                                            Glide.with(PhotoActivity.this).load(url)
-                                                    .signature(new StringSignature(updateTime))
-                                                    .into(Pic);*/
-
+                                            progressBar.setVisibility( View.INVISIBLE );
+                                            finish();
                                         }
                                     });
                                 }else{
@@ -329,9 +423,7 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
 
             }
         }).start();
-
     }
-
 
     //教师端发布人脸敲到 上传照片
     private void TeacherUPhoto() {
@@ -347,17 +439,24 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
         final String postId = getLetter (6);//生成8位随机字符串
         Intent intent = getIntent();
         teacherId = intent.getStringExtra("teacherId");
-        final String  courseId = intent.getStringExtra("courseId");
+        courseId = intent.getStringExtra("courseId");
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 OkHttpClient client = new OkHttpClient();
-                UriPathUtils uriPathUtils = new UriPathUtils();
-                imagePath= uriPathUtils.getRealPathFromUri(context,mUri);
-                System.out.printf(imagePath );
-                File file = new File( imagePath );
-                System.out.printf(file.getName().toString());
+
+
+                String fileName = null;
+                File file = null;
+
+                try {
+                    file  = new File( imagePath );
+                    Log.d( "PhotoActivity", file.getAbsolutePath() );
+                }catch (Exception e){
+                    Log.d( "PhotoActivity", e.getMessage() );
+                }
+
                 RequestBody image = RequestBody.create( MediaType.parse("image/jpg"), file);
                 RequestBody requestBody = new MultipartBody.Builder()
                         .setType( MultipartBody.FORM)
@@ -370,16 +469,22 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                         .addFormDataPart( "file_save_path_InServer",file_save_path_InServer )
                         .build();
 
-                System.out.printf( "111111111111111111" );
                 Request request = new Request.Builder()
                         .url(server+"postIfaceCheck/")
                         .post(requestBody)
                         .build();
                 Call call = client.newCall(request);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressBar.setVisibility( View.VISIBLE );
+                    }
+                });
+
+
                 call.enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        //...
                         System.out.printf( "!!!!!!!!!!!!!!!!!!!失败" );
                     }
 
@@ -387,10 +492,24 @@ public class PhotoActivity extends AppCompatActivity implements View.OnClickList
                     public void onResponse(Call call, Response response) throws IOException {
                         if(response.isSuccessful()){
                             final String result = response.body().string();
+
+                            JSONObject jsonObject= null;
+                            try {
+                                jsonObject = new JSONObject( result );
+                                num =jsonObject.getInt( "num" );
+                                filename =jsonObject.getString( "filename" );
+                                Log.d( "PhotoActivity", "000"+result );
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-
+                                    Toast.makeText( PhotoActivity.this,"上传成功",Toast.LENGTH_SHORT ).show();
+                                    progressBar.setVisibility( View.INVISIBLE );
+                                    //s_res_num.setText( "识别结果人数："+ String.valueOf( num ));
+                                    finish();
                                 }
                             });
                         }

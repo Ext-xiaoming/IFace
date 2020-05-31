@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -45,7 +46,7 @@ public class MainFragmentClass extends Fragment {
     private static String TAG = "MainFragmentClass";
     private String  teacherId;
     private String teacherName;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView ;
     private List<CourseListItem> listItemCourses;
     private CoursesAdapter coursesAdapter;
@@ -62,35 +63,34 @@ public class MainFragmentClass extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate( R.layout.main_fragment_class ,container, false);//fragment_message为底部栏的界面
 
+        //下拉刷新
+        swipeRefreshLayout=view.findViewById( R.id.swipeRefreshlayout3);
+        swipeRefreshLayout.setColorSchemeResources(R.color.blue);
         recyclerView = view.findViewById(R.id.course_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(),DividerItemDecoration.VERTICAL));
         Log.i(TAG,"进入onCreateView");
         //从 course表中查找并以列表的形式显示出来
-
         LodeListView();
-
-        /*recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int position,
-                                    long arg3) {
-                Intent intent = new Intent(getActivity () , Kaoqin.class);//考勤界面
-                intent.putExtra("teacherId",teacherId);
-                intent.putExtra("teacherName", listItemCourses.get(position).getTeacherName());
-                intent.putExtra("courseName", listItemCourses.get(position).getCourseName());
-                intent.putExtra("courseId", listItemCourses.get(position).getCourseId());
-                startActivity(intent);
-            }
-        });*/
-
         return view;
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //这里获取数据的逻辑
+                LodeListView();
+                Log.i(TAG , "1"+ "执行刷新" );
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+    }
     //加载ListView
     private void LodeListView(){
-        /**
-         * 传递 teacherId 、
-         * 获取 course_name、course_id、teacher_name
-         * */
 
         new Thread(new Runnable() {
             @Override
@@ -191,66 +191,3 @@ public class MainFragmentClass extends Fragment {
     }
 
 }
-
-/*new Thread( new Runnable() {
-            @Override
-            public void run() {
-
-                //教师名称 + 课程名称 + 加课码
-                //首先查询 教师名称
-
-                DBUtils dbUtils= new DBUtils();
-                String sql = "select  teacher_name from  teacher where teacher_id ="+teacherId;
-                ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-                /////////////////////////////////////////////////////////////////////////////////////////////
-                try{
-                    if(resultSet.next()) {
-                        System.out.println( resultSet.getString("teacher_name") );
-                        teacherName=resultSet.getString( "teacher_name" );
-                        resultSet.getStatement().getConnection().close();
-                    }else {
-                        System.out.println("未知错误" );
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    System.out.printf( e.getMessage() );
-                }
-                /////////////////////////////////////////////////////////////////////////////////////////////
-
-                //查询课程列表
-                sql = "select course_id , course_name from  course  where teacher_id ="+teacherId;
-                resultSet = dbUtils.excuteSQL( sql );
-                try{
-                    while(resultSet.next()){
-                        CourseListItem item = new CourseListItem();//////////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!需要new 出新的对象
-                        System.out.println( resultSet.getString("course_name") );
-                        item.setCourseId( resultSet.getString("course_id") );
-                        item.setCourseName(resultSet.getString("course_name"));
-                        item.setTeacherName(teacherName);
-                        listItemCourses.add(item);
-                    }
-
-                    final  CoursesAdapter coursesAdapter = new CoursesAdapter(getActivity() ,//***********************************
-                            R.layout.course_item , listItemCourses);//MainActivity.this = getActivity ()
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            System.out.println( "list.size="+listItemCourses.size()+"--00000000000000\n");
-                            for (int i = 0; i < listItemCourses.size(); i++) {
-                                CourseListItem s = (CourseListItem)listItemCourses.get(i);
-                                System.out.println(i+"输出："+s.getCourseId()+"  "+s.getCourseName()+"  "+s.getTeacherName()+"\n");
-                            }
-                            lvListView.setAdapter(coursesAdapter);
-                        }
-                    });
-                    resultSet.getStatement().getConnection().close();
-                }catch (Exception e){
-                    e.printStackTrace();
-                    System.out.printf( e.getMessage() );
-                }
-            }
-        } ).start();*/
-
-//Toast.makeText(getActivity(), "查询成功：共"+coursesAdapter.getCount()+"条数据。" , Toast.LENGTH_LONG).show();

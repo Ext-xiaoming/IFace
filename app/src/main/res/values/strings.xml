@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">课堂签到系统</string>
+    <string name="app_name">IFace</string>
 
     <string name="app_picker_name">Applications</string>
     <string name="bookmark_picker_name">Bookmarks</string>

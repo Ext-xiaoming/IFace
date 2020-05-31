@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 
 import org.json.JSONArray;
@@ -57,8 +58,12 @@ public class Kaoqin extends BaseActivity {
 
     private TextView biaoti;
 
+    private String courseName;
+    private String teacherName;
     private String courseCode;//从主界面来的课程码
     private String teacherId;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private String TAG = "Kaoqin";
     private AdapterKaoqin adapterKaoqin;
     private List<ListItemKaoqin> listItemKaoqin ;//ListItem课程集
@@ -72,11 +77,19 @@ public class Kaoqin extends BaseActivity {
         }
         setContentView( R.layout.kaoqin);
 
+        //下拉刷新
+        swipeRefreshLayout=findViewById( R.id.swipeRefreshlayout1);
+        swipeRefreshLayout.setColorSchemeResources(R.color.blue);
+
+
+
         recyclerView = findViewById(R.id.kaoqin_list);
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         Intent mainToKQ = getIntent();
         courseCode = mainToKQ.getStringExtra("courseId");//课程码匹配
         teacherId=mainToKQ.getStringExtra("teacherId");
+        courseName=mainToKQ.getStringExtra("courseName");
+        teacherName=mainToKQ.getStringExtra("teacherName");
 
         Log.i(TAG,"1."+courseCode);
 
@@ -88,10 +101,6 @@ public class Kaoqin extends BaseActivity {
         back.setOnClickListener(new View.OnClickListener() {//返回按钮
             @Override
             public void onClick(View view) {
-               /* ActivityCollectorUtil.finishActivity( MainActivity.class);
-                Intent intent=new Intent(Kaoqin.this,MainActivity.class);
-                startActivity(intent);
-                ActivityCollectorUtil.finishActivity(Kaoqin.class);*/
                 finish();
             }
         });
@@ -106,7 +115,8 @@ public class Kaoqin extends BaseActivity {
                 intent2.putExtra("courseId",courseCode);
                 intent2.putExtra("teacherId",teacherId);
                 intent2.putExtra("flag","1");
-
+                intent2.putExtra("teacherName", teacherName);
+                intent2.putExtra("courseName",courseName);
                 startActivity(intent2);
 
             }
@@ -122,36 +132,31 @@ public class Kaoqin extends BaseActivity {
                 intent2.putExtra("courseId",courseCode);
                 intent2.putExtra("teacherId",teacherId);
                 intent2.putExtra("flag","1");
+                intent2.putExtra("teacherName", teacherName);
+                intent2.putExtra("courseName",courseName);
 
                 startActivity(intent2);
             }
         });
 
         LodeListView();
-
+        Log.i(TAG , "2"+ "执行" );
     }
 
-   /* public int QueryNum(int post_id)
-    {
-        int num=0;
-
-        DBUtils dbUtils= new DBUtils();
-        String sql = "select student_id from sign_in where post_id ="+post_id;
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-            while(resultSet.next()){
-                //System.out.println( resultSet.getString("course_name") );
-                num++;//统计人数
+    @Override
+    protected void onResume() {
+        super.onResume();
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //这里获取数据的逻辑
+                LodeListView();
+                Log.i(TAG , "1"+ "执行刷新" );
+                swipeRefreshLayout.setRefreshing(false);
             }
+        });
 
-            resultSet.getStatement().getConnection().close();
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.printf( e.getMessage() );
-        }
-        return num;
-    }*/
+    }
 
     public void LodeListView(){
         /**
@@ -206,6 +211,7 @@ public class Kaoqin extends BaseActivity {
                 JSONObject jsonObject = jsonArray.getJSONObject( i );
                 ListItemKaoqin item = new ListItemKaoqin();
                 int num=jsonObject.getInt( "num" );
+                int num_all=jsonObject.getInt( "num_all" );
                 String post_num =jsonObject.getString( "post_num" );
                 String post_date =jsonObject.getString( "post_date" );
                 String post_id =jsonObject.getString( "post_id" );
@@ -221,7 +227,7 @@ public class Kaoqin extends BaseActivity {
                 item.setPostId( post_id);
                 item.setCheckNumber(post_num);
                 item.setTime(post_date);
-                item.setQiandaoNumber(String.valueOf(num));//签到人数  ！由服务器返回
+                item.setQiandaoNumber(String.valueOf(num)+" / "+String.valueOf(num_all));//签到人数  ！由服务器返回
                 listItemKaoqin.add(item);
             }
 
@@ -253,6 +259,7 @@ public class Kaoqin extends BaseActivity {
                     public void onItemClick(int position) {
                         Intent intent = new Intent(Kaoqin.this , QiandaoStatus.class);//考勤界面,传入第几次考勤
                         intent.putExtra("checkNum", listItemKaoqin.get(position).getCheckNumber());//第几次考勤
+                        intent.putExtra("flag",listItemKaoqin.get(position).getPostType());
                         intent.putExtra("courseId",courseCode);
                         intent.putExtra("postId",listItemKaoqin.get(position).getPostId());
                         startActivity(intent);
@@ -264,55 +271,3 @@ public class Kaoqin extends BaseActivity {
 
 }
 
-
-/*
-        new Thread( new Runnable() {
-@Override
-public void run() {
-
-        //***********************************************************************************************************
-        //签到情况展示（补充未签到成功的同学名单）
-        //***********************************************************************************************************
-        //签到第几次 + 时间  + 签到成功人数
-        //签到次序 和 时间
-
-        DBUtils dbUtils= new DBUtils();
-
-        String sql = "select post_id , post_date , post_num from post_check_in where course_id ="+courseCode +" order by post_num desc";
-        System.out.printf( sql );
-        ResultSet resultSet = dbUtils.excuteSQL( sql );
-
-        try{
-        while(resultSet.next()){
-        ListItemKaoqin item = new ListItemKaoqin();
-        item.setCheckNumber(resultSet.getString( "post_num" ));
-        item.setTime(resultSet.getString("post_date"));
-        item.setPostId( resultSet.getString( "post_id" ) );
-        item.setQiandaoNumber(String.valueOf( QueryNum(resultSet.getInt( "post_id" )) ));
-        listItemKaoqin.add(item);
-        }
-        adapterKaoqin = new AdapterKaoqin(Kaoqin.this,
-        R.layout.item_kaoqian, listItemKaoqin);
-
-
-        runOnUiThread(new Runnable() {
-@Override
-public void run() {
-        System.out.println( "list.size="+listItemKaoqin.size()+"--00000000000000\n");
-        for (int i = 0; i < listItemKaoqin.size(); i++) {
-        ListItemKaoqin s = (ListItemKaoqin)listItemKaoqin.get(i);
-        System.out.println(i+"输出："+s.getCheckNumber()+"  "+s.getPostId()+"  "+s.getQiandaoNumber()+"\n");
-        }
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager( Kaoqin.this );
-        recyclerView.setLayoutManager( linearLayoutManager );
-        recyclerView.setAdapter(adapterKaoqin);
-        }
-        });
-        resultSet.getStatement().getConnection().close();
-        }catch (Exception e){
-        e.printStackTrace();
-        System.out.printf( e.getMessage() );
-        }
-        }
-        } ).start();*/

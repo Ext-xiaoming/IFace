@@ -31,17 +31,13 @@ public class StuMainFragmentUser extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate( R.layout.fragment_user ,container, false);//fragment_message为底部签到栏的界面
-
         TextView xuehao_text = view.findViewById(R.id.stuxuehao_text);
         TextView name_text = view.findViewById(R.id.stuname_text);
-
         xuehao_text.setText(userId);
         name_text.setText(userName);
-
         TextView zhuxiao_text = view.findViewById(R.id.stuzhuxiao_text);
         TextView xiugai_text  = view.findViewById(R.id.stuxiugai_text);
         TextView shangchuanzp_text  = view.findViewById(R.id.stushangchuanzp_text);
-
 
         //上传个人照片功能（上传到服务器，人脸识别功能）
         shangchuanzp_text.setOnClickListener(new View.OnClickListener() {
@@ -51,12 +47,9 @@ public class StuMainFragmentUser extends Fragment {
                 Intent intent=new Intent(getActivity(), PhotoActivity.class);
                 intent.putExtra("studentId",userId);
                 intent.putExtra("flag","0");///学生
-
-
                 startActivity(intent);
             }
         });
-
 
         //修改密码功能
         xiugai_text.setOnClickListener(new View.OnClickListener() {

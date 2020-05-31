@@ -45,13 +45,26 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
+        android:grantUriPermissions="true"
+
         >
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="dc.iface.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                tools:replace="android:resource"
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
@@ -65,18 +78,31 @@
         </service>
 
         <activity android:name=".login.LoginActivity"><!--student MAIN -->
+            <!--<intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+
+        <activity android:name=".TakePhotos.PhotoActivity"><!-- MAIN -->
+
+        </activity>
+
+
+        <activity android:name=".login.LogoActivity"><!-- MAIN -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".TakePhotos.PhotoActivity"><!-- MAIN -->
 
-        </activity>
         <activity android:name=".TakePhotos.TakePhotoActivity"><!-- MAIN -->
 
         </activity>
         <activity android:name=".TakePhotos.FaceActivity"><!-- MAIN -->
+
+
+
 
         </activity>
         <activity android:name=".login.SignupActiviy"><!--student MAIN -->
